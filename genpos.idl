@@ -1,0 +1,79 @@
+module or {
+  module genpos {
+    
+    /* configuration and velocity of a cart-like mobile robot */
+    struct cart_state {
+      double xRef;		/* position  */
+      double yRef;		/* control point */
+      double xRob;		/* position */
+      double yRob;		/* robot center */
+      double theta;		/* robot orientation*/
+      double v;			/* longitudinal linear velocity */
+      double vt;		/* linear velocity (transversal) */
+      double w;			/* angular velocity */
+    };
+
+    /* configuration of a cart-like mobile robot */
+    struct cart_config {
+      double x;
+      double y;
+      double theta;
+    };
+
+    /* Incertitudes sur x, y et theta */
+    struct cart_config_var {
+      double var[6];
+    };
+    
+    /* direction of motion */
+    enum motion_direction {
+      GENPOS_FORWARD_MOTION,
+      GENPOS_BACKWARD_MOTION
+    };
+    
+    enum data_type {
+      GENPOS_POS_DATA,
+      GENPOS_SPEED_DATA,
+      GENPOS_POS_AND_SPEED_DATA
+    };
+
+    /* reference state in a trajectory tracking process */
+    struct cart_ref {
+      long numRef;	 /* current reference number (incremented) */
+      long tickPeriod;	 /* Period of the ref update (0 if unknown) */
+      data_type dataType;	 /* Pertinent data following */
+      motion_direction backFlag; /* forward or BACKWARD */
+      double x;                  /* Abscisse ref point */
+      double y;                  /* Ordonnee ref point */
+      double theta;              /* Angle */
+      double v;                  /* linear speed AT REF POINT (longitudinal) */
+      double vt;                 /* transversal linear speed AT REF POINT */
+      double w;                  /* angular speed AT REF POINT */
+      double vmax;               /* linear speed max during servo */
+      double wmax;               /* angular speed max during servo */
+      double linAccelMax;        /* Accel lin max */
+      double angAccelMax;        /* Accel ang max */
+    };
+
+    /* reference speed in a speed control process */
+    struct cart_speed {
+      long numRef;	/* Number of the reference */
+      long updatePeriod; /* Number of loco period to reach the reference */
+      double v;		/* linear speed (longitudinal) */
+      double vt;	/* transversal linear speed */
+      double w;		/* angular speed */
+      double vmax;
+      double wmax;
+      double linAccelMax;
+      double angAccelMax;
+    };
+
+    enum track_mode {
+      GENPOS_NO_TRACKING,
+      GENPOS_TRACK_POS,
+      GENPOS_TRACK_CONFIG,
+      GENPOS_TRACK_SPEED,
+      GENPOS_TRACK_TRAILER
+    };
+  };
+};

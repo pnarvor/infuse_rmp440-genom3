@@ -1,0 +1,120 @@
+/*
+ * Copyright (c) 2017 CNRS
+ *
+ * Author: Matthieu Herrb - LAAS
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+#include "genpos.idl"
+#include "rmp440Struct.idl"
+
+component rmp440 {
+  version "0.1";
+  email "openrobots@laas.fr";
+  lang "c";
+
+  port in or::genpos::cart_speed cmd_vel;
+  port out or::genpos::cart_state Odo;
+  port out rmp440::status_str status;
+
+  ids {
+    string device;
+    status_str status;
+    or::genpos::cart_state robot;
+    or::genpos::cart_config_var var;
+    or::genpos::cart_ref ref;
+    or::genpos::track_mode trackMode;
+    
+  };
+
+  exception bad_ref;
+  exception rmp_lib_error{long rmp_lib_code;};
+  exception joystick_error{long errno;};
+  exception gyro_error{long errno;};
+  exception motors_off;
+  exception emergency_stop;
+  exception power_cord_connected;
+  exception poster_not_found;
+  exception cmd_stop_track;
+
+  task MotionTask {
+    period 50ms;
+    stack 65536;
+    codel <start>initOdoAndAsserv() yield ether, odo;
+    codel <odo>odo() yield ether, asserv;
+    codel <asserv>asserv() yield ether, end;
+    codel <end>endOdoAndAsserv() yield ether;
+    throw emergency_stop;
+  };
+
+  task TrackTask {
+    period 50ms;
+    stack 8192;
+  };
+
+  activity Init(in string device) {
+    doc "Connect to USB bus";
+    codel <start>rmp440InitStart(ids in device) yield main;
+    codel <main>rmp440InitMain() yield ether;
+    task MotionTask;
+  };
+
+  activity JoystickOn() {
+    doc "Activate joystick motion mode";
+    task MotionTask;
+    codel <start>rmp440JoystickOnStart() yield ether, main, inter;
+    codel <main>rmp440JoystickOnMain() yield ether, inter;
+    codel <inter>rmp440JoystickOnInter() yield ether;
+    throw bad_ref, rmp_lib_error, joystick_error, motors_off,
+      emergency_stop, power_cord_connected;
+    interrupts JoystickOn, Track;
+  };
+
+activity Track(in or::genpos::track_mode mode) {
+    doc  "Start tracking a reference poster";
+    codel <start>trackStart(port in cmd_vel, in mode) yield main, end;
+    codel <main>pumpReference() yield main, end;
+    codel <end>smoothStopTrack() yield ether;
+    task TrackTask;
+    throw poster_not_found, bad_ref, cmd_stop_track, motors_off,
+      emergency_stop, power_cord_connected;
+    interrupts JoystickOn, Track;
+  };
+
+  function Stop() {
+    doc "Stop current Tracking";
+    interrupts Track;
+  };
+
+  activity Gyro(in gyro_mode mode) {
+    doc "Gyro configuration";
+    task MotionTask;
+    codel <start>rmp440GyroStart(in mode) yield exec, ether;
+    codel <exec>rmp440GyroExec() yield exec, ether;
+    throw gyro_error;
+    interrupts Gyro;
+  };
+};
+
+
+/* SetParameters */
+
+
+/* SetPom */
+
+/* SetPos */
+
+/* Log */
+
+
