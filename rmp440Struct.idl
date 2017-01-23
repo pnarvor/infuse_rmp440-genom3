@@ -1,6 +1,10 @@
 
+
+/* internal structure for communication with RMP440 */
+native rmp440_io;
+
 module rmp440 {
-  
+
   enum mode {
     RMP440_IDLE,
     RMP440_MOTORS_OFF,

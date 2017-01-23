@@ -30,6 +30,7 @@ component rmp440 {
 
   ids {
     string device;
+    rmp440_io rmp;
     status_str status;
     or::genpos::cart_state robot;
     or::genpos::cart_config_var var;
@@ -65,7 +66,7 @@ component rmp440 {
 
   activity Init(in string device) {
     doc "Connect to USB bus";
-    codel <start>rmp440InitStart(ids in device) yield main;
+    codel <start>rmp440InitStart(ids in device, ids out rmp) yield main;
     codel <main>rmp440InitMain() yield ether;
     task MotionTask;
   };
