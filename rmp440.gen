@@ -23,6 +23,7 @@ component rmp440 {
   version "0.1";
   email "openrobots@laas.fr";
   lang "c";
+  codels-require "rmp440-libs, gyro-libs, felib";
 
   port in or::genpos::cart_speed cmd_vel;
   port out or::genpos::cart_state Odo;
