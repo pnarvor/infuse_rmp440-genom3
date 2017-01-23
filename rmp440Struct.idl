@@ -11,7 +11,7 @@ module rmp440 {
   };
 
 /* copy-paste of rmp440.h:rmp440_feedback */
-  struct feedback {
+  struct feedback_genom {
     unsigned long fault_status[4];
     unsigned long mcu_fault_status[4];
 	float frame_count;
@@ -97,7 +97,7 @@ module rmp440 {
 
   struct status_str {
     mode rs_mode;
-    feedback rs_data;
+    feedback_genom rs_data;
   };
 
   /* Gyro */
