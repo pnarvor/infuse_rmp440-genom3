@@ -24,6 +24,7 @@
 native rmp440_io;
 native rmp440_feedback;
 native FE_STR;
+native GYRO_DATA;
 
 module rmp440 {
 
