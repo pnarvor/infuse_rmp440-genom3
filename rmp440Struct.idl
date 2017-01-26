@@ -196,3 +196,26 @@ module rmp440 {
   };
     
 };
+
+/* begin COMMON between RMP models */
+module rmp {
+  enum model {
+    model_400,
+    model_440
+  };
+
+  struct status_str {
+    double receive_date;
+    model rmp_model;
+    rmp440::mode rs_mode;
+    double propulsion_battery_level;
+    double aux_battery_level;
+    double pitch, roll, yaw_rate;
+    double v, w;
+    double v_target, w_target;
+    float right_front_vel, left_front_vel, right_rear_vel, left_rear_vel;
+    float right_front_pos, left_front_pos, right_rear_pos, left_rear_pos;
+    float right_front_torque, left_front_torque, right_rear_torque, left_rear_torque;
+  };
+};
+/* end COMMON between RMP models */
