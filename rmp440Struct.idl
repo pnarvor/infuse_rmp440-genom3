@@ -1,17 +1,39 @@
-
+/*
+ * Copyright (c) 2009-2017 CNRS/LAAS
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+/**
+ ** Author: Matthieu Herrb
+ ** Date: April 2009 for rmp400, updated for rmp440, May 2013, 
+ **       updated for genom3, January 2017
+ **
+ **/
 
 /* internal structure for communication with RMP440 */
 native rmp440_io;
+native rmp440_feedback;
+native FE_STR;
 
 module rmp440 {
 
   enum mode {
-    RMP440_IDLE,
-    RMP440_MOTORS_OFF,
-    RMP440_MANUAL,
-    RMP440_TRACK,
-    RMP440_EMERGENCY,
-    RMP440_POWER_COORD
+    mode_idle,
+    mode_motors_off,
+    mode_manual,
+    mode_track,
+    mode_emergency,
+    mode_power_coord
   };
 
 /* copy-paste of rmp440.h:rmp440_feedback */
@@ -104,20 +126,72 @@ module rmp440 {
     feedback_genom rs_data;
   };
 
+  /* Kinematics of the robot */
+  struct kinematics_str {
+    double leftWheelRadius;	
+    double rightWheelRadius;
+    double axisWidth;
+  };
+
+  /* Current dynamic parameters, from the nvram */
+  struct dynamic_str {
+    double vMax;
+    double wMax;
+    double linAccelMax;
+    double angAccelMax;
+  };
+
+  /* Coefficient proportionnel a la vitesse pour calculer l'erreur sur 
+     le deplacement des roues */
+  struct var_params {
+    double coeffLin;
+    double coeffAng;
+    double coeffLinAng;
+  };
+
   /* Gyro */
   enum gyro_mode {
-    RMP440_GYRO_OFF,
-    RMP440_GYRO_ON_IF_MOTION,
-    RMP440_GYRO_ON
+    gyro_off,
+    gyro_on_if_motion,
+    gyro_on
+  };
+
+  struct gyro_params {
+    gyro_mode mode;
+    string port;
+    GYRO_TYPE type;
+    double latitude;
+    double woffset;
   };
 
   struct gyro {
+    gyro_params params;
     boolean gyroOn;
     gyro_mode currentMode;
     double gyroToRobotOffset;
     double gyroTheta;
     double robotTheta;
     double gyroOmega;
+  };
+
+  struct gyro_asserv {
+    boolean enabled; // is asserv enabled
+    
+    boolean first; // first call to this function ?
+    boolean straight; // is in straight mode ?
+    double straight_angle; // angle for straight mode
+    double prev_reference;
+    double prev_measure;
+    double prev_command;
+    double prev_t;
+    double integral_s;
+    double jump_t; // last jump time
+  };
+
+  /* Acceleration limitation code */
+  struct max_accel {
+    double prev_vel_command;
+    double prev_vel_command_t;
   };
     
 };
