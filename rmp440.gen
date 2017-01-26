@@ -31,7 +31,8 @@ component rmp440 {
 
   port in or::genpos::cart_speed cmd_vel;
   port out or::genpos::cart_state Odo;
-  port out rmp440::status_str status;
+  port out status_str Status;
+  port out rmp::status_str StatusGeneric;
 
   ids {
     string device;
@@ -39,11 +40,13 @@ component rmp440 {
     FE_STR fe;
     mode rs_mode;
     rmp440_feedback rs_data;
-    kinematics_str kinematics;
-    dynamic_str dynamics;
+    status_str status;
+    rmp::status_str statusgen;
     or::genpos::cart_state robot;
     or::genpos::cart_config_var var;
     or::genpos::cart_ref ref;
+    kinematics_str kinematics;
+    dynamic_str dynamics;
     or::genpos::track_mode trackMode;
     GYRO_DATA gyroId;
     gyro gyro;
@@ -74,9 +77,25 @@ component rmp440 {
 				  ids out gyro,
 				  ids out gyro_mode,
 				  ids out gyro_asserv) yield ether, odo;
-    codel <odo>odo() yield ether, asserv;
-    codel <asserv>asserv() yield ether, end;
-    codel <end>endOdoAndAsserv() yield ether;
+    codel <odo>odo(ids in rmp,
+		   ids inout gyroId,
+		   ids inout fe,
+		   ids inout robot,
+		   ids inout ref,
+		   ids out rs_data,
+		   ids out rs_mode,
+		   ids out gyro,
+		   ids out gyro_asserv,
+		   ids out status,
+		   ids out statusgen) yield ether, asserv;
+    codel <asserv>asserv(ids in rmp,
+			 ids in robot,
+			 ids in gyro,
+			 ids inout rs_data,
+			 ids inout ref,
+			 ids inout rs_mode,
+			 ids out statusgen) yield ether, end;
+    codel <end>endOdoAndAsserv(ids inout rmp, ids inout rs_data) yield ether;
     throw emergency_stop;
   };
 
@@ -129,8 +148,7 @@ component rmp440 {
   activity Gyro(in gyro_mode mode) {
     doc "Gyro configuration";
     task MotionTask;
-    codel <start>rmp440GyroStart(in mode) yield exec, ether;
-    codel <exec>rmp440GyroExec() yield exec, ether;
+    codel <start>rmp440GyroExec(in mode, ids out gyroId) yield ether;
     throw gyro_error;
     interrupts Gyro;
   };
