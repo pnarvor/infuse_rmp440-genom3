@@ -27,14 +27,14 @@ module or {
     
     /* direction of motion */
     enum motion_direction {
-      GENPOS_FORWARD_MOTION,
-      GENPOS_BACKWARD_MOTION
+      forward_motion,
+      backward_motion
     };
     
     enum data_type {
-      GENPOS_POS_DATA,
-      GENPOS_SPEED_DATA,
-      GENPOS_POS_AND_SPEED_DATA
+      pos_data,
+      speed_data,
+      pos_and_speed_data
     };
 
     /* reference state in a trajectory tracking process */
