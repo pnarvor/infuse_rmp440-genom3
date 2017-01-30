@@ -135,8 +135,16 @@ component rmp440 {
   activity Track(in or::genpos::track_mode mode) {
     doc  "Start tracking a reference poster";
     codel <start>trackStart(port in cmd_vel, in mode) yield main, end;
-    codel <main>pumpReference() yield main, end;
-    codel <end>smoothStopTrack() yield ether;
+    codel <main>pumpReference(ids in robot,
+			      ids in rs_mode,
+			      ids in track_mode,
+			      port in cmd_vel,
+			      ids out ref) yield main, end;
+    codel <end>smoothStopTrack(ids in robot,
+			       ids in dynamics,
+			       ids inout rs_mode,
+			       ids inout track_mode,
+			       ids out ref) yield ether;
     task TrackTask;
     throw poster_not_found, bad_ref, cmd_stop_track, motors_off,
       emergency_stop, power_cord_connected;
