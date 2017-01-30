@@ -47,7 +47,7 @@ component rmp440 {
     or::genpos::cart_ref ref;
     kinematics_str kinematics;
     dynamic_str dynamics;
-    or::genpos::track_mode trackMode;
+    or::genpos::track_mode track_mode;
     GYRO_DATA gyroId;
     gyro gyro;
     gyro_mode gyro_mode;
