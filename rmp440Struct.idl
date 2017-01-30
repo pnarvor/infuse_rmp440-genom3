@@ -15,7 +15,7 @@
  */
 /**
  ** Author: Matthieu Herrb
- ** Date: April 2009 for rmp400, updated for rmp440, May 2013, 
+ ** Date: April 2009 for rmp400, updated for rmp440, May 2013,
  **       updated for genom3, January 2017
  **
  **/
@@ -27,6 +27,26 @@ native FE_STR;
 native GYRO_DATA;
 
 module rmp440 {
+
+  const double sec_period = 0.05; // 50ms
+
+  const double delay_gyro_omega = 0.3; // delay between command and measure, in seconds
+  const double kp_gyro_omega = 2.0;
+  const double kp_gyro_theta = 10.0;
+  const double ki_gyro_theta = 2.0;
+
+  // max errors
+  const double longit_max_gap = 0.5;
+  const double transv_max_gap = 0.5;
+  const double ang_max_gap = 0.5;
+
+  const double longit_error_max = 0.5;
+  const double transv_error_max = 0.5;
+  const double ang_error_max = 0.5;
+
+  const double longit_max_err_sum = 1.0;
+  const double transv_max_err_sum = 1.0;
+  const double ang_max_err_sum = 1.0;
 
   enum mode {
     mode_idle,
@@ -129,7 +149,7 @@ module rmp440 {
 
   /* Kinematics of the robot */
   struct kinematics_str {
-    double leftWheelRadius;	
+    double leftWheelRadius;
     double rightWheelRadius;
     double axisWidth;
   };
@@ -142,7 +162,7 @@ module rmp440 {
     double angAccelMax;
   };
 
-  /* Coefficient proportionnel a la vitesse pour calculer l'erreur sur 
+  /* Coefficient proportionnel a la vitesse pour calculer l'erreur sur
      le deplacement des roues */
   struct var_params {
     double coeffLin;
@@ -177,7 +197,7 @@ module rmp440 {
 
   struct gyro_asserv {
     boolean enabled; // is asserv enabled
-    
+
     boolean first; // first call to this function ?
     boolean straight; // is in straight mode ?
     double straight_angle; // angle for straight mode
@@ -194,7 +214,7 @@ module rmp440 {
     double prev_vel_command;
     double prev_vel_command_t;
   };
-    
+
 };
 
 /* begin COMMON between RMP models */
