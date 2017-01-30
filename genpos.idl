@@ -69,11 +69,11 @@ module or {
     };
 
     enum track_mode {
-      GENPOS_NO_TRACKING,
-      GENPOS_TRACK_POS,
-      GENPOS_TRACK_CONFIG,
-      GENPOS_TRACK_SPEED,
-      GENPOS_TRACK_TRAILER
+      no_tracking,
+      track_pos,
+      track_config,
+      track_speed,
+      track_trailer
     };
   };
 };
