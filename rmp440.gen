@@ -60,6 +60,7 @@ component rmp440 {
     or::genpos::cart_ref ref;
     kinematics_str kinematics;
     dynamic_str dynamics;
+    var_params var_params;
     or::genpos::track_mode track_mode;
     GYRO_DATA gyroId;
     gyro gyro;
@@ -69,6 +70,8 @@ component rmp440 {
     log_str log;
   };
 
+  attribute set_var_params(in var_params);
+
   /*----------------------------------------------------------------------*/
 
   task MotionTask {
@@ -77,11 +80,14 @@ component rmp440 {
     codel <start>initOdoAndAsserv(out ::ids) yield ether, odo;
     codel <odo>odoAndAsserv(in rmp,
 			    in track_mode,
+			    in kinematics,
+			    in var_params,
 			    inout gyroId,
 			    inout fe,
 			    inout robot,
 			    inout ref,
 			    inout max_accel,
+			    out var,
 			    out rs_data,
 			    out rs_mode,
 			    out gyro,

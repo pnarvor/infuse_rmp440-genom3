@@ -448,7 +448,7 @@ initOdoAndAsserv(rmp440_ids *ids, genom_context self)
 	ref->linAccelMax = RMP_DEFAULT_MAXIMUM_ACCEL;
 	ref->angAccelMax = RMP_DEFAULT_MAXIMUM_YAW_ACCEL;
 
-#if 0
+#ifdef notyet
 	/* Control parameters */
 	cmdId = &rmp440DataStrId->cmd;
 	cmdId->distPoint = RMP440_DIST_TO_CONTROLLED_POINT;
@@ -505,9 +505,11 @@ initOdoAndAsserv(rmp440_ids *ids, genom_context self)
  */
 genom_event
 odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
-             GYRO_DATA **gyroId, FE_STR **fe,
-             or_genpos_cart_state *robot, or_genpos_cart_ref *ref,
-             rmp440_max_accel *max_accel, rmp440_feedback **rs_data,
+             const rmp440_kinematics_str *kinematics,
+             const rmp440_var_params *var_params, GYRO_DATA **gyroId,
+             FE_STR **fe, or_genpos_cart_state *robot,
+             or_genpos_cart_ref *ref, rmp440_max_accel *max_accel,
+             or_genpos_cart_config_var *var, rmp440_feedback **rs_data,
              rmp440_mode *rs_mode, rmp440_gyro *gyro,
              rmp440_gyro_asserv *gyro_asserv,
              const rmp440_Status *Status,
@@ -546,11 +548,10 @@ odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
 	robot->yRef = robot->yRob;
 
 
-#ifdef notyet
 	odoProba(robot, var,
-	    kinematics->axisWidth, varParams->coeffLinAng,
-	    EXEC_TASK_PERIOD(RMP440_MOTIONTASK_NUM));
-#endif
+	    kinematics->axisWidth, var_params->coeffLinAng,
+	    rmp440_sec_period);
+
 	/* Gyro */
 	if (gyroId != NULL /* && gyro->currentMode != RMP440_GYRO_OFF */) {
 		if (gyroRead(*gyroId, &(gyro->gyroTheta),
