@@ -154,10 +154,15 @@ component rmp440 {
     interrupts Track;
   };
 
-  activity Gyro(in gyro_mode mode) {
+  /*----------------------------------------------------------------------*/
+
+  activity Gyro(in gyro_params params) {
     doc "Gyro configuration";
     task MotionTask;
-    codel <start>rmp440GyroExec(in mode, ids out gyroId) yield ether;
+    codel <start>rmp440GyroExec(in params,
+				ids in robot,
+				ids inout gyro,
+				ids inout gyroId) yield ether;
     throw gyro_error;
     interrupts Gyro;
   };

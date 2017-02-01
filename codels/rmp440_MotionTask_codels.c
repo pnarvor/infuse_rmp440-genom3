@@ -872,9 +872,34 @@ rmp440JoystickOnInter(genom_context self)
  * Throws rmp440_emergency_stop, rmp440_gyro_error.
  */
 genom_event
-rmp440GyroExec(rmp440_gyro_mode mode, GYRO_DATA **gyroId,
-               genom_context self)
+rmp440GyroExec(const rmp440_gyro_params *params,
+               const or_genpos_cart_state *robot, rmp440_gyro *gyro,
+               GYRO_DATA **gyroId, genom_context self)
 {
-  /* skeleton sample: insert your code */
-  /* skeleton sample */ return rmp440_ether;
+
+	if (*gyroId == NULL) {
+		*gyroId = gyroInit(params->type, params->port,
+			    params->latitude, params->woffset);
+		if (*gyroId == NULL) {
+			gyro->params.mode = rmp440_gyro_off;
+			gyro->currentMode = rmp440_gyro_off;
+			return rmp440_gyro_error(self);
+		}
+	}
+
+	/* read gyro once */
+	if (gyroReadAngle(*gyroId, &gyro->gyroTheta) != 0) {
+		gyro->params.mode = rmp440_gyro_off;
+		gyro->currentMode = rmp440_gyro_off;
+		gyroEnd(*gyroId);
+		*gyroId = NULL;
+		return rmp440_gyro_error(self);
+	} else
+		gyro->gyroTheta = - gyro->gyroTheta;
+	/* reset gyro offset to match odo */
+	gyro->gyroToRobotOffset = robot->theta - gyro->gyroTheta;
+
+	gyro->currentMode = gyro->params.mode;
+
+	return rmp440_ether;
 }
