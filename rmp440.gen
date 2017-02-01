@@ -111,7 +111,7 @@ component rmp440 {
 
   activity Init(in string<32> device = 
 		"10.40.40.40:8080": "robot device specification") {
-    doc "Connect to RMP440 micro-controller";
+    doc "Connect to RMP440 robot";
     codel <start>rmp440InitStart(in device,
 				 out rmp, out fe, out rs_data)
       yield main;
@@ -139,7 +139,8 @@ component rmp440 {
 
   /*----------------------------------------------------------------------*/
 
-  activity Track(in or::genpos::track_mode mode) {
+  activity Track(in or::genpos::track_mode mode = 
+		 or::genpos::track_speed: "Tracking mode") {
     doc  "Start tracking a reference poster";
     codel <start>trackStart(port in cmd_vel, in mode) yield main, end;
     codel <main>pumpReference(in robot,
