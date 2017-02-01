@@ -736,7 +736,7 @@ endOdoAndAsserv(rmp440_io **rmp, rmp440_feedback **rs_data,
  *        rmp440_malloc_error, rmp440_rmplib_error.
  */
 genom_event
-rmp440InitStart(const char *device, rmp440_io **rmp, FE_STR **fe,
+rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
                 rmp440_feedback **rs_data, genom_context self)
 {
 	/* error if already connected */

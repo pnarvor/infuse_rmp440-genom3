@@ -51,7 +51,6 @@ component rmp440 {
   native log_str;
 
   ids {
-    string device;
     rmp440_io rmp;
     FE_STR fe;
     mode rs_mode;
@@ -78,28 +77,28 @@ component rmp440 {
     period 50ms;
     stack 65536;
     codel <start>initOdoAndAsserv(out ::ids) yield ether, odo;
-    codel <odo>odo(ids in rmp,
-		   ids inout gyroId,
-		   ids inout fe,
-		   ids inout robot,
-		   ids inout ref,
-		   ids out rs_data,
-		   ids out rs_mode,
-		   ids out gyro,
-		   ids out gyro_asserv,
-		   ids out status,
-		   ids out statusgen) yield ether, asserv;
-    codel <asserv>asserv(ids in rmp,
-			 ids in robot,
-			 ids in gyro,
-			 ids in track_mode,
-			 ids inout gyro_asserv,
-			 ids inout max_accel,
-			 ids inout rs_data,
-			 ids inout ref,
-			 ids inout rs_mode,
-			 ids out statusgen) yield ether, end;
-    codel <end>endOdoAndAsserv(ids inout rmp, ids inout rs_data) yield ether;
+    codel <odo>odo(in rmp,
+		   inout gyroId,
+		   inout fe,
+		   inout robot,
+		   inout ref,
+		   out rs_data,
+		   out rs_mode,
+		   out gyro,
+		   out gyro_asserv,
+		   out status,
+		   out statusgen) yield ether, asserv;
+    codel <asserv>asserv(in rmp,
+			 in robot,
+			 in gyro,
+			 in track_mode,
+			 inout gyro_asserv,
+			 inout max_accel,
+			 inout rs_data,
+			 inout ref,
+			 inout rs_mode,
+			 out statusgen) yield ether, end;
+    codel <end>endOdoAndAsserv(inout rmp, inout rs_data) yield ether;
     throw emergency_stop;
   };
 
@@ -110,16 +109,17 @@ component rmp440 {
 
   /*----------------------------------------------------------------------*/
 
-  activity Init(in string device) {
-    doc "Connect to USB bus";
-    codel <start>rmp440InitStart(ids in device,
-				 ids out rmp, ids out fe, ids out rs_data)
+  activity Init(in string<32> device = 
+		"10.40.40.40:8080": "robot device specification") {
+    doc "Connect to RMP440 micro-controller";
+    codel <start>rmp440InitStart(in device,
+				 out rmp, out fe, out rs_data)
       yield main;
-    codel <main>rmp440InitMain(ids in rmp,
-			       ids out rs_data,
-			       ids out rs_mode,
-			       ids out dynamics,
-			       ids out kinematics) yield ether;
+    codel <main>rmp440InitMain(in rmp,
+			       out rs_data,
+			       out rs_mode,
+			       out dynamics,
+			       out kinematics) yield ether;
     throw already_initialized, malloc_error, rmplib_error;
     task MotionTask;
   };
@@ -142,16 +142,16 @@ component rmp440 {
   activity Track(in or::genpos::track_mode mode) {
     doc  "Start tracking a reference poster";
     codel <start>trackStart(port in cmd_vel, in mode) yield main, end;
-    codel <main>pumpReference(ids in robot,
-			      ids in rs_mode,
-			      ids in track_mode,
+    codel <main>pumpReference(in robot,
+			      in rs_mode,
+			      in track_mode,
 			      port in cmd_vel,
-			      ids out ref) yield main, end;
-    codel <end>smoothStopTrack(ids in robot,
-			       ids in dynamics,
-			       ids inout rs_mode,
-			       ids inout track_mode,
-			       ids out ref) yield ether;
+			      out ref) yield main, end;
+    codel <end>smoothStopTrack(in robot,
+			       in dynamics,
+			       inout rs_mode,
+			       inout track_mode,
+			       out ref) yield ether;
     task TrackTask;
     throw poster_not_found, bad_ref, cmd_stop_track, motors_off,
       emergency_stop, power_cord_connected;
@@ -169,9 +169,9 @@ component rmp440 {
     doc "Gyro configuration";
     task MotionTask;
     codel <start>rmp440GyroExec(in params,
-				ids in robot,
-				ids inout gyro,
-				ids inout gyroId) yield ether;
+				in robot,
+				inout gyro,
+				inout gyroId) yield ether;
     throw gyro_error;
     interrupts Gyro;
   };
