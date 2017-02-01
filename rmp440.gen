@@ -72,7 +72,7 @@ component rmp440 {
   /*----------------------------------------------------------------------*/
 
   task MotionTask {
-    period 50ms;
+    period sec_period s;
     stack 65536;
     codel <start>initOdoAndAsserv(out ::ids) yield ether, odo;
     codel <odo>odoAndAsserv(in rmp,
@@ -93,7 +93,7 @@ component rmp440 {
   };
 
   task TrackTask {
-    period 50ms;
+    period sec_period s;
     stack 8192;
   };
 
