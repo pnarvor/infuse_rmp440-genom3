@@ -1,0 +1,11 @@
+# pkg-config file for uninstalled rmp440 interface and codels library
+#
+prefix=@abs_top_builddir@
+libdir=${prefix}/codels
+includedir=${prefix}/codels
+
+Name: rmp440-genom3
+Description: rmp440 interface and codels library
+Version: @PACKAGE_VERSION@
+Requires: gyro-libs >= 3.0.99.0, rmp440-libs, gyro-libs, felib
+Libs: ${libdir}/librmp440_codels.la

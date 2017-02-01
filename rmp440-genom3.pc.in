@@ -1,0 +1,15 @@
+# pkg-config file for rmp440 interface and codels library
+#
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+datarootdir=@datarootdir@
+idldir=@datadir@/idl
+
+Name: rmp440-genom3
+Description: rmp440 interface and codels library
+Version: @PACKAGE_VERSION@
+Requires: gyro-libs >= 3.0.99.0, rmp440-libs, gyro-libs, felib
+Cflags: -I${includedir} -I${idldir}
+Libs: -L${libdir} -lrmp440_codels
