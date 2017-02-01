@@ -55,8 +55,6 @@ component rmp440 {
     FE_STR fe;
     mode rs_mode;
     rmp440_feedback rs_data;
-    status_str status;
-    rmp::status_str statusgen;
     or::genpos::cart_state robot;
     or::genpos::cart_config_var var;
     or::genpos::cart_ref ref;
@@ -77,27 +75,19 @@ component rmp440 {
     period 50ms;
     stack 65536;
     codel <start>initOdoAndAsserv(out ::ids) yield ether, odo;
-    codel <odo>odo(in rmp,
-		   inout gyroId,
-		   inout fe,
-		   inout robot,
-		   inout ref,
-		   out rs_data,
-		   out rs_mode,
-		   out gyro,
-		   out gyro_asserv,
-		   out status,
-		   out statusgen) yield ether, asserv;
-    codel <asserv>asserv(in rmp,
-			 in robot,
-			 in gyro,
-			 in track_mode,
-			 inout gyro_asserv,
-			 inout max_accel,
-			 inout rs_data,
-			 inout ref,
-			 inout rs_mode,
-			 out statusgen) yield pause::odo, ether, end;
+    codel <odo>odoAndAsserv(in rmp,
+			    in track_mode,
+			    inout gyroId,
+			    inout fe,
+			    inout robot,
+			    inout ref,
+			    inout max_accel,
+			    out rs_data,
+			    out rs_mode,
+			    out gyro,
+			    out gyro_asserv,
+			    out Status,
+			    out StatusGeneric) yield ether, pause::odo, end;
     codel <end>endOdoAndAsserv(inout rmp, inout rs_data) yield ether;
     throw emergency_stop;
   };

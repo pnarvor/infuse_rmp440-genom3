@@ -497,29 +497,38 @@ initOdoAndAsserv(rmp440_ids *ids, genom_context self)
 }
 
 
-/** Codel odo of task MotionTask.
+/** Codel odoAndAsserv of task MotionTask.
  *
  * Triggered by rmp440_odo.
- * Yields to rmp440_ether, rmp440_asserv.
+ * Yields to rmp440_ether, rmp440_pause_odo, rmp440_end.
  * Throws rmp440_emergency_stop.
  */
 genom_event
-odo(const rmp440_io *rmp, GYRO_DATA **gyroId, FE_STR **fe,
-    or_genpos_cart_state *robot, or_genpos_cart_ref *ref,
-    rmp440_feedback **rs_data, rmp440_mode *rs_mode, rmp440_gyro *gyro,
-    rmp440_gyro_asserv *gyro_asserv, rmp440_status_str *status,
-    rmp_status_str *statusgen, genom_context self)
+odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
+             GYRO_DATA **gyroId, FE_STR **fe,
+             or_genpos_cart_state *robot, or_genpos_cart_ref *ref,
+             rmp440_max_accel *max_accel, rmp440_feedback **rs_data,
+             rmp440_mode *rs_mode, rmp440_gyro *gyro,
+             rmp440_gyro_asserv *gyro_asserv,
+             const rmp440_Status *Status,
+             const rmp440_StatusGeneric *StatusGeneric,
+             genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
 	double direction;
 	uint32_t date;
+	rmp440_status_str *status = Status->data(self);
+	rmp_status_str *statusgen = StatusGeneric->data(self);
+	double vRef, wRef;
+	double vCommand, wCommand;
+	genom_event report = genom_ok;
 
 #if DEBUG>=1
 	static int count = 0;
 #endif
 
 	if (rmp == NULL)
-		return rmp440_asserv;		/* not initialized yet */
+		return rmp440_pause_odo; /* not initialized yet */
 
 	rmp440ReceiveAndDecode(rmp, data);
 	rmp440DataUpdate(data, *fe, status, statusgen);
@@ -605,31 +614,9 @@ odo(const rmp440_io *rmp, GYRO_DATA **gyroId, FE_STR **fe,
 	if (odometryMode == RMP440_ODO_3D)
 		rmp440Odo3d(EXEC_TASK_PERIOD(RMP440_MOTIONTASK_NUM));
 #endif
-	return rmp440_asserv;
-}
-
-
-/** Codel asserv of task MotionTask.
- *
- * Triggered by rmp440_asserv.
- * Yields to rmp440_pause_odo, rmp440_ether, rmp440_end.
- * Throws rmp440_emergency_stop.
- */
-genom_event
-asserv(const rmp440_io *rmp, const or_genpos_cart_state *robot,
-       const rmp440_gyro *gyro, or_genpos_track_mode track_mode,
-       rmp440_gyro_asserv *gyro_asserv, rmp440_max_accel *max_accel,
-       rmp440_feedback **rs_data, or_genpos_cart_ref *ref,
-       rmp440_mode *rs_mode, rmp_status_str *statusgen,
-       genom_context self)
-{
-	double vRef, wRef;
-	double vCommand, wCommand;
-	genom_event report = genom_ok;
-	rmp440_feedback *data = *rs_data;
-
-	if (rmp == NULL)
-		return rmp440_pause_odo; /* not initialized yet */
+	/*
+	 * Asserv
+	 */
 
 	switch (*rs_mode) {
 	case rmp440_mode_motors_off:
@@ -694,9 +681,14 @@ asserv(const rmp440_io *rmp, const or_genpos_cart_state *robot,
 	//(SDI_F->status.rs_data[0].yaw_rate + SDI_F->status.rs_data[1].yaw_rate)/2.0; // do not use internal gyros, they are wrong
 
 	rmp440VelocitySet(rmp, data, vRef, wRef, &vCommand, &wCommand);
+
+	/* publish */
+	Status->write(self);
+	StatusGeneric->write(self);
 #ifdef notyet
 	updatePomPosters();
 #endif
+
 
 	return rmp440_pause_odo;
 }
