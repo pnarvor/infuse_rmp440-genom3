@@ -612,7 +612,7 @@ odo(const rmp440_io *rmp, GYRO_DATA **gyroId, FE_STR **fe,
 /** Codel asserv of task MotionTask.
  *
  * Triggered by rmp440_asserv.
- * Yields to rmp440_ether, rmp440_end.
+ * Yields to rmp440_pause_odo, rmp440_ether, rmp440_end.
  * Throws rmp440_emergency_stop.
  */
 genom_event
@@ -629,12 +629,12 @@ asserv(const rmp440_io *rmp, const or_genpos_cart_state *robot,
 	rmp440_feedback *data = *rs_data;
 
 	if (rmp == NULL)
-		return rmp440_odo;		/* not initialized yet */
+		return rmp440_pause_odo; /* not initialized yet */
 
 	switch (*rs_mode) {
 	case rmp440_mode_motors_off:
 		/* No motion possible */
-		return rmp440_odo;
+		return rmp440_pause_odo;
 
 	case rmp440_mode_emergency:
 	case rmp440_mode_idle:
@@ -698,7 +698,7 @@ asserv(const rmp440_io *rmp, const or_genpos_cart_state *robot,
 	updatePomPosters();
 #endif
 
-	return rmp440_odo;
+	return rmp440_pause_odo;
 }
 
 

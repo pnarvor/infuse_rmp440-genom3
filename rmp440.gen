@@ -97,7 +97,7 @@ component rmp440 {
 			 inout rs_data,
 			 inout ref,
 			 inout rs_mode,
-			 out statusgen) yield ether, end;
+			 out statusgen) yield pause::odo, ether, end;
     codel <end>endOdoAndAsserv(inout rmp, inout rs_data) yield ether;
     throw emergency_stop;
   };
@@ -147,7 +147,7 @@ component rmp440 {
 			      in rs_mode,
 			      in track_mode,
 			      port in cmd_vel,
-			      out ref) yield main, end;
+			      out ref) yield pause::main, end;
     codel <end>smoothStopTrack(in robot,
 			       in dynamics,
 			       inout rs_mode,

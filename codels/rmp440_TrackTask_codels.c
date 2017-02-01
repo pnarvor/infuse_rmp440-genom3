@@ -72,7 +72,7 @@ trackStart(const rmp440_cmd_vel *cmd_vel, or_genpos_track_mode mode,
 /** Codel pumpReference of activity Track.
  *
  * Triggered by rmp440_main.
- * Yields to rmp440_main, rmp440_end.
+ * Yields to rmp440_pause_main, rmp440_end.
  * Throws rmp440_poster_not_found, rmp440_bad_ref,
  *        rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
@@ -100,9 +100,9 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
 #endif
 	case or_genpos_track_speed:
 		pumpSpeedReference(robot, cmd_vel, ref, self);
-		return rmp440_main;
+		return rmp440_pause_main;
 	default:
-		return  rmp440_main;
+		return  rmp440_pause_main;
 
 	}
 }
