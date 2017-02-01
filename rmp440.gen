@@ -70,13 +70,7 @@ component rmp440 {
   task MotionTask {
     period 50ms;
     stack 65536;
-    codel <start>initOdoAndAsserv(ids out robot,
-				  ids out ref,
-				  ids out kinematics,
-				  ids out max_accel,
-				  ids out gyro,
-				  ids out gyro_mode,
-				  ids out gyro_asserv) yield ether, odo;
+    codel <start>initOdoAndAsserv(out ::ids) yield ether, odo;
     codel <odo>odo(ids in rmp,
 		   ids inout gyroId,
 		   ids inout fe,

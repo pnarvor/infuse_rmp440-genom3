@@ -411,12 +411,15 @@ control_yaw(rmp440_gyro_asserv *gyro,
  * Throws rmp440_emergency_stop.
  */
 genom_event
-initOdoAndAsserv(or_genpos_cart_state *robot, or_genpos_cart_ref *ref,
-                 rmp440_kinematics_str *kinematics,
-                 rmp440_max_accel *max_accel, rmp440_gyro *gyro,
-                 rmp440_gyro_mode *gyro_mode,
-                 rmp440_gyro_asserv *gyro_asserv, genom_context self)
+initOdoAndAsserv(rmp440_ids *ids, genom_context self)
 {
+	rmp440_kinematics_str *kinematics = &ids->kinematics;
+	or_genpos_cart_state *robot = &ids->robot;
+	or_genpos_cart_ref *ref = &ids->ref;
+	rmp440_gyro *gyro = &ids->gyro;
+	rmp440_gyro_asserv *gyro_asserv = &ids->gyro_asserv;
+	rmp440_max_accel *max_accel = &ids->max_accel;
+
 	/* Kinematics */
 	kinematics->leftWheelRadius = RMP_X2_TIRE_DIAMETER/2.0;
 	kinematics->rightWheelRadius = RMP_X2_TIRE_DIAMETER/2.0;
