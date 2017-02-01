@@ -29,6 +29,19 @@ component rmp440 {
   lang "c";
   codels-require "rmp440-libs, gyro-libs, felib";
 
+  exception already_initialized;
+  exception malloc_error;
+  exception bad_ref;
+  exception rmplib_error;
+  exception joystick_error;
+  exception gyro_error;
+  exception motors_off;
+  exception emergency_stop;
+  exception power_cord_connected;
+  exception poster_not_found;
+  exception cmd_stop_track;
+  exception sys_error;
+
   port in or::genpos::cart_speed cmd_vel;
   port out or::genpos::cart_state Odo;
   port out status_str Status;
@@ -59,17 +72,7 @@ component rmp440 {
     log_str log;
   };
 
-  exception already_initialized;
-  exception malloc_error;
-  exception bad_ref;
-  exception rmplib_error;
-  exception joystick_error{long errno;};
-  exception gyro_error{long errno;};
-  exception motors_off;
-  exception emergency_stop;
-  exception power_cord_connected;
-  exception poster_not_found;
-  exception cmd_stop_track;
+  /*----------------------------------------------------------------------*/
 
   task MotionTask {
     period 50ms;
@@ -105,6 +108,8 @@ component rmp440 {
     stack 8192;
   };
 
+  /*----------------------------------------------------------------------*/
+
   activity Init(in string device) {
     doc "Connect to USB bus";
     codel <start>rmp440InitStart(ids in device,
@@ -119,6 +124,8 @@ component rmp440 {
     task MotionTask;
   };
 
+  /*----------------------------------------------------------------------*/
+
   activity JoystickOn() {
     doc "Activate joystick motion mode";
     task MotionTask;
@@ -129,6 +136,8 @@ component rmp440 {
       emergency_stop, power_cord_connected;
     interrupts JoystickOn, Track;
   };
+
+  /*----------------------------------------------------------------------*/
 
   activity Track(in or::genpos::track_mode mode) {
     doc  "Start tracking a reference poster";
@@ -166,13 +175,13 @@ component rmp440 {
     throw gyro_error;
     interrupts Gyro;
   };
-};
+
+  /* SetParameters */
 
 
-/* SetParameters */
+  /* SetPom */
 
-
-/* SetPom */
+  /* SetPos */
 
   /*----------------------------------------------------------------------*/
   /* Log */
