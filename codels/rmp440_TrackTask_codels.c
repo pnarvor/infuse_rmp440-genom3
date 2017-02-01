@@ -30,8 +30,10 @@
 
 static void
 pumpSpeedReference(const or_genpos_cart_state *robot,
-    const or_genpos_cart_speed *orders, or_genpos_cart_ref *ref)
+    const rmp440_cmd_vel *cmd_vel, or_genpos_cart_ref *ref,
+    genom_context self)
 {
+	or_genpos_cart_speed *orders = cmd_vel->data(self);
 
 	/* Transmettre la consigne */
 	ref->backFlag = (orders->v > 0 ?
@@ -92,12 +94,12 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
 	switch (track_mode) {
 #ifdef notyet
 	case or_genpos_track_pos:
-		return pumpConfigReference(robot, cmd_vel, ref);
+		return pumpConfigReference(robot, cmd_vel, ref, self);
 	case or_genpos_track_config:
-		return pumpConfigReference();
+		return pumpConfigReference(robot, cmd_vel, ref, self);
 #endif
 	case or_genpos_track_speed:
-		pumpSpeedReference(robot, cmd_vel, ref);
+		pumpSpeedReference(robot, cmd_vel, ref, self);
 		return rmp440_main;
 	default:
 		return  rmp440_main;
