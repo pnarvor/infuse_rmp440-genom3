@@ -28,12 +28,16 @@
 
 /* --- Task TrackTask --------------------------------------------------- */
 
-static void
+static genom_event
 pumpSpeedReference(const or_genpos_cart_state *robot,
     const rmp440_cmd_vel *cmd_vel, or_genpos_cart_ref *ref,
     genom_context self)
 {
-	or_genpos_cart_speed *orders = cmd_vel->data(self);
+	or_genpos_cart_speed *orders;
+
+	if (cmd_vel->read(self) != genom_ok)
+		return rmp440_bad_ref(self);
+	orders = cmd_vel->data(self);
 
 	/* Transmettre la consigne */
 	ref->backFlag = (orders->v > 0 ?
@@ -47,7 +51,7 @@ pumpSpeedReference(const or_genpos_cart_state *robot,
 	ref->linAccelMax = orders->linAccelMax;
 	ref->angAccelMax = orders->angAccelMax;
 	ref->dataType = or_genpos_speed_data;
-	return;
+	return rmp440_pause_main;
 }
 
 
@@ -65,8 +69,9 @@ genom_event
 trackStart(const rmp440_cmd_vel *cmd_vel, or_genpos_track_mode mode,
            genom_context self)
 {
-  /* skeleton sample: insert your code */
-  /* skeleton sample */ return rmp440_main;
+	if (cmd_vel->read(self) != genom_ok)
+		return rmp440_poster_not_found(self);
+	return rmp440_main;
 }
 
 /** Codel pumpReference of activity Track.
@@ -83,6 +88,7 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
               const rmp440_cmd_vel *cmd_vel, or_genpos_cart_ref *ref,
               genom_context self)
 {
+
 	/* Check if mode changed */
 	switch (rs_mode) {
 	case rmp440_mode_emergency:
@@ -99,8 +105,7 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
 		return pumpConfigReference(robot, cmd_vel, ref, self);
 #endif
 	case or_genpos_track_speed:
-		pumpSpeedReference(robot, cmd_vel, ref, self);
-		return rmp440_pause_main;
+		return pumpSpeedReference(robot, cmd_vel, ref, self);
 	default:
 		return  rmp440_pause_main;
 
