@@ -34,6 +34,9 @@ component rmp440 {
   port out status_str Status;
   port out rmp::status_str StatusGeneric;
 
+  /*----------------------------------------------------------------------*/
+  native log_str;
+
   ids {
     string device;
     rmp440_io rmp;
@@ -53,6 +56,7 @@ component rmp440 {
     gyro_mode gyro_mode;
     gyro_asserv gyro_asserv;
     max_accel max_accel;
+    log_str log;
   };
 
   exception already_initialized;
@@ -165,6 +169,17 @@ component rmp440 {
 
 /* SetPom */
 
-/* SetPos */
+  /*----------------------------------------------------------------------*/
+  /* Log */
+  function log(in string<64> path = "/tmp/rmp440.log": "Log file name") {
+    doc "Log RMP440 internal data";
+    codel log_start(in path, inout log);
+    throws sys_error;
+  };
 
-/* Log */
+  function log_stop() {
+    doc "Stop logging";
+    codel log_stop(out log);
+  };
+  
+};
