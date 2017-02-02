@@ -42,13 +42,19 @@ component rmp440 {
   exception cmd_stop_track;
   exception sys_error;
 
+  struct odo_str {
+    or::genpos::cart_state robot;
+    or::genpos::cart_config_var var;
+  };
+
   port in or::genpos::cart_speed cmd_vel;
-  port out or::genpos::cart_state Odo;
+  port out odo_str Odo;
   port out status_str Status;
   port out rmp::status_str StatusGeneric;
 
   /*----------------------------------------------------------------------*/
   native log_str;
+
 
   ids {
     rmp440_io rmp;
@@ -56,7 +62,6 @@ component rmp440 {
     mode rs_mode;
     rmp440_feedback rs_data;
     or::genpos::cart_state robot;
-    or::genpos::cart_config_var var;
     or::genpos::cart_ref ref;
     kinematics_str kinematics;
     dynamic_str dynamics;
@@ -87,11 +92,11 @@ component rmp440 {
 			    inout robot,
 			    inout ref,
 			    inout max_accel,
-			    out var,
 			    out rs_data,
 			    out rs_mode,
 			    out gyro,
 			    out gyro_asserv,
+			    out Odo,
 			    out Status,
 			    out StatusGeneric) yield ether, pause::odo, end;
     codel <end>endOdoAndAsserv(inout rmp, inout rs_data) yield ether;

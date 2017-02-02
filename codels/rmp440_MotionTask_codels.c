@@ -510,10 +510,9 @@ odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
              const rmp440_var_params *var_params, GYRO_DATA **gyroId,
              FE_STR **fe, or_genpos_cart_state *robot,
              or_genpos_cart_ref *ref, rmp440_max_accel *max_accel,
-             or_genpos_cart_config_var *var, rmp440_feedback **rs_data,
-             rmp440_mode *rs_mode, rmp440_gyro *gyro,
-             rmp440_gyro_asserv *gyro_asserv,
-             const rmp440_Status *Status,
+             rmp440_feedback **rs_data, rmp440_mode *rs_mode,
+             rmp440_gyro *gyro, rmp440_gyro_asserv *gyro_asserv,
+             const rmp440_Odo *Odo, const rmp440_Status *Status,
              const rmp440_StatusGeneric *StatusGeneric,
              genom_context self)
 {
@@ -525,6 +524,7 @@ odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
 	double vRef, wRef;
 	double vCommand, wCommand;
 	genom_event report = genom_ok;
+	or_genpos_cart_config_var *var = &Odo->data(self)->var;
 
 #if DEBUG>=1
 	static int count = 0;
@@ -547,7 +547,6 @@ odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
 
 	robot->xRef = robot->xRob;
 	robot->yRef = robot->yRob;
-
 
 	odoProba(robot, var,
 	    kinematics->axisWidth, var_params->coeffLinAng,
@@ -685,8 +684,11 @@ odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
 	rmp440VelocitySet(rmp, data, vRef, wRef, &vCommand, &wCommand);
 
 	/* publish */
+	memcpy(&Odo->data(self)->robot, robot, sizeof(or_genpos_cart_state));
+	Odo->write(self);
 	Status->write(self);
 	StatusGeneric->write(self);
+
 #ifdef notyet
 	updatePomPosters();
 #endif
