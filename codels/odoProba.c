@@ -20,6 +20,7 @@
 
 #include "rmp440_c_types.h"
 #include "orMathLib.h"
+#include "odoProba.h"
 
 /*
  * Odometry error evaluation
