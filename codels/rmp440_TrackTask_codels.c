@@ -18,6 +18,7 @@
  ** Date: January 2017
  **/
 
+#include <sys/param.h>
 #include <math.h>
 #include <stdio.h>
 
