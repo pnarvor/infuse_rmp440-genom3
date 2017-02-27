@@ -641,7 +641,12 @@ odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
 	if (rmp == NULL)
 		return rmp440_pause_odo; /* not initialized yet */
 
-	rmp440ReceiveAndDecode(rmp, data);
+	if (rmp440ReceiveAndDecode(rmp, data) < 0) {
+		/* Probably motors OFF - no communication on the RMP440 */
+		status->rs_mode = statusgen->rs_mode = rmp440_mode_motors_off;
+		return rmp440_pause_odo;
+	}
+
 	rmp440DataUpdate(data, *fe, status, statusgen);
 
 	/* Read config */
