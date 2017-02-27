@@ -520,14 +520,19 @@ control_yaw(rmp440_gyro_asserv *gyro,
  * Throws rmp440_emergency_stop.
  */
 genom_event
-initOdoAndAsserv(rmp440_ids *ids, genom_context self)
+initOdoAndAsserv(rmp440_ids *ids,
+                 const rmp440_StatusGeneric *StatusGeneric,
+                 genom_context self)
 {
+	rmp_status_str *statusgen = StatusGeneric->data(self);
 	rmp440_kinematics_str *kinematics = &ids->kinematics;
 	or_genpos_cart_state *robot = &ids->robot;
 	or_genpos_cart_ref *ref = &ids->ref;
 	rmp440_gyro *gyro = &ids->gyro;
 	rmp440_gyro_asserv *gyro_asserv = &ids->gyro_asserv;
 	rmp440_max_accel *max_accel = &ids->max_accel;
+
+	statusgen->rmp_model = rmp_model_440;
 
 	/* Kinematics */
 	kinematics->leftWheelRadius = RMP_X2_TIRE_DIAMETER/2.0;
@@ -899,7 +904,6 @@ rmp440InitMain(const rmp440_io *rmp, rmp440_feedback **rs_data,
 	}
 	printf("Motors ON\n");
 	*rs_mode = rmp440_mode_idle;
-	// sdi_f->statusgen.rmp_model = RMP_MODEL_440;
 	/* init kinematics from robot NVRAM */
 	kinematics->leftWheelRadius = data->fram_tire_diameter/2.0;
 	kinematics->rightWheelRadius = data->fram_tire_diameter/2.0;

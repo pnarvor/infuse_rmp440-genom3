@@ -82,7 +82,8 @@ component rmp440 {
   task MotionTask {
     period sec_period s;
     stack 65536;
-    codel <start>initOdoAndAsserv(out ::ids) yield ether, odo;
+    codel <start>initOdoAndAsserv(out ::ids, out StatusGeneric) 
+      yield ether, odo;
     codel <odo>odoAndAsserv(in rmp,
 			    in track_mode,
 			    in kinematics,
