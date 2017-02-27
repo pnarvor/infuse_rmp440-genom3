@@ -618,11 +618,12 @@ initOdoAndAsserv(rmp440_ids *ids,
  * Throws rmp440_emergency_stop.
  */
 genom_event
-odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
+odoAndAsserv(const rmp440_io *rmp,
              const rmp440_kinematics_str *kinematics,
              const rmp440_var_params *var_params, GYRO_DATA **gyroId,
              FE_STR **fe, or_genpos_cart_state *robot,
              or_genpos_cart_ref *ref, rmp440_max_accel *max_accel,
+             or_genpos_track_mode *track_mode,
              rmp440_feedback **rs_data, rmp440_mode *rs_mode,
              rmp440_gyro *gyro, rmp440_gyro_asserv *gyro_asserv,
              const rmp440_Odo *Odo, const rmp440_Status *Status,
@@ -767,7 +768,7 @@ odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
 #endif
 
 	case rmp440_mode_track:
-		report = track(ref, robot, track_mode, &vRef, &wRef, self);
+		report = track(ref, robot, *track_mode, &vRef, &wRef, self);
 		break;
 
 	default:
@@ -777,9 +778,8 @@ odoAndAsserv(const rmp440_io *rmp, or_genpos_track_mode track_mode,
 		/* In case an error occured,
 		   stop the robot and the tracking */
 		*rs_mode = statusgen->rs_mode = rmp440_mode_idle;
-#ifdef notyet
-		trackStr->trackMode = GENPOS_NO_TRACKING;
-#endif
+		*track_mode = or_genpos_no_tracking;
+
 		vRef = 0;
 		wRef = 0;
 		return report;

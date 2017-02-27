@@ -85,7 +85,6 @@ component rmp440 {
     codel <start>initOdoAndAsserv(out ::ids, out StatusGeneric) 
       yield ether, odo;
     codel <odo>odoAndAsserv(in rmp,
-			    in track_mode,
 			    in kinematics,
 			    in var_params,
 			    inout gyroId,
@@ -93,6 +92,7 @@ component rmp440 {
 			    inout robot,
 			    inout ref,
 			    inout max_accel,
+			    inout track_mode,
 			    out rs_data,
 			    out rs_mode,
 			    out gyro,
