@@ -18,6 +18,7 @@ dnl External packages
 PKG_CHECK_MODULES(requires, [
   genom3 >= 2.99.4
   gyro-libs >= 3.0.99.0
+  openrobots-idl >= 1.1
   rmp440-libs, gyro-libs, felib
 ])
 

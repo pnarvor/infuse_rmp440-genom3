@@ -17,11 +17,13 @@
  */
 
 #pragma require "gyro-libs >= 3.0.99.0"
+#pragma require "openrobots-idl >= 1.1"
 
 #include "genpos.idl"
 #include "gyroLib/gyroTypes.idl"
 
 #include "rmp440Struct.idl"
+#include "or/hid/joystick.gen"
 
 component rmp440 {
   version "0.1";
@@ -48,6 +50,7 @@ component rmp440 {
   };
 
   port in or::genpos::cart_speed cmd_vel;
+  port in or_joystick::state Joystick;
   port out odo_str Odo;
   port out status_str Status;
   port out rmp::status_str StatusGeneric;
@@ -87,6 +90,7 @@ component rmp440 {
     codel <odo>odoAndAsserv(in rmp,
 			    in kinematics,
 			    in var_params,
+			    in Joystick,
 			    inout gyroId,
 			    inout fe,
 			    inout robot,
@@ -131,9 +135,9 @@ component rmp440 {
   activity JoystickOn() {
     doc "Activate joystick motion mode";
     task MotionTask;
-    codel <start>rmp440JoystickOnStart() yield ether, main, inter;
-    codel <main>rmp440JoystickOnMain() yield ether, inter;
-    codel <inter>rmp440JoystickOnInter() yield ether;
+    codel <start>rmp440JoystickOnStart(in Joystick) yield ether, main, inter;
+    codel <main>rmp440JoystickOnMain(in Joystick, in rs_mode) yield ether, inter;
+    codel <inter>rmp440JoystickOnInter(out rs_mode, out ref) yield ether;
     throw bad_ref, rmplib_error, joystick_error, motors_off,
       emergency_stop, power_cord_connected;
     interrupts JoystickOn, Track;

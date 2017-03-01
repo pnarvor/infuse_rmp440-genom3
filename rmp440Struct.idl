@@ -48,6 +48,10 @@ module rmp440 {
   const double transv_max_err_sum = 1.0;
   const double ang_max_err_sum = 1.0;
 
+  // joystick
+  const double joystick_vgain = 1./(32768.0*32768.0); /* 1 m/s max */
+  const double joystick_wgain = 1./(32768.0*32768.0); /* 1 rad/s max */
+
   enum mode {
     mode_idle,
     mode_motors_off,

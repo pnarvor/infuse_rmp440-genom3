@@ -277,9 +277,11 @@ rmp440VelocitySet(const rmp440_io *rmp, const rmp440_feedback *data,
 	w = -w/data->fram_yaw_rate_limit;
 
 	/* Send commands to motors if ON */
-	if (data->operational_state == 4)
-		rmp440Motion(rmp, v, w);
-	else
+	if (data->operational_state == 4) {
+		printf("rmp440Motion(rmp, %lf, %lf)\n", v, w);
+		//rmp440Motion(rmp, v, w);
+		rmp440CmdNone(rmp);
+	} else
 		rmp440CmdNone(rmp);
 }
 
@@ -512,6 +514,54 @@ control_yaw(rmp440_gyro_asserv *gyro,
 }
 
 /*----------------------------------------------------------------------*/
+/*
+ * joystick axis and buttons assignements
+ */
+#define V_AXIS 1
+#define W_AXIS 0
+#define MOVE_BUTTON_SLOW 2
+#define MOVE_BUTTON_MIDDLE 0
+#define MOVE_BUTTON_FAST 1
+#define QUIT_BUTTON 3
+
+/*
+ * Convert joystick values to reference speed
+ *
+ * A square function is used to get more precision at low speeds.
+ *
+ */
+static void
+getJoystickSpeeds(struct or_joystick_state *joy, rmp440_feedback *data,
+    double *v, double *w, double *avmax, double *awmax)
+{
+	double vmaxw = -2, vmaxv = -2, againw = -2, againv = -2;
+
+	if (joy->buttons._buffer[MOVE_BUTTON_SLOW]) {
+		vmaxw = 0.7; vmaxv = 0.5; againw = 0.5; againv = 0.6;
+	}
+	if (joy->buttons._buffer[MOVE_BUTTON_MIDDLE]) {
+		vmaxw = 0.9; vmaxv = 1.3; againw = 0.6; againv = 0.8;
+	}
+	if (joy->buttons._buffer[MOVE_BUTTON_FAST]) {
+		vmaxw = 1.1; vmaxv = 2.0; againw = 0.8; againv = 1.0;
+	}
+	if (vmaxv > -1) {
+		*v = -SIGN(joy->axes._buffer[V_AXIS]) *
+		    joy->axes._buffer[V_AXIS] * joy->axes._buffer[V_AXIS]
+		  * rmp440_joystick_vgain * vmaxv;
+		*w = -SIGN(joy->axes._buffer[W_AXIS]) *
+		    joy->axes._buffer[W_AXIS] * joy->axes._buffer[W_AXIS]
+		  * rmp440_joystick_wgain * vmaxw;
+		if (avmax) *avmax = data->fram_accel_limit * againv;
+		if (awmax) *awmax = data->fram_yaw_accel_limit * againw;
+	}
+	else {
+		*v = 0;
+		*w = 0;
+	}
+}
+
+/*----------------------------------------------------------------------*/
 
 /** Codel initOdoAndAsserv of task MotionTask.
  *
@@ -620,7 +670,8 @@ initOdoAndAsserv(rmp440_ids *ids,
 genom_event
 odoAndAsserv(const rmp440_io *rmp,
              const rmp440_kinematics_str *kinematics,
-             const rmp440_var_params *var_params, GYRO_DATA **gyroId,
+             const rmp440_var_params *var_params,
+             const rmp440_Joystick *Joystick, GYRO_DATA **gyroId,
              FE_STR **fe, or_genpos_cart_state *robot,
              or_genpos_cart_ref *ref, rmp440_max_accel *max_accel,
              or_genpos_track_mode *track_mode,
@@ -752,20 +803,17 @@ odoAndAsserv(const rmp440_io *rmp,
 		ref->theta = robot->theta;
 		break;
 
-#ifdef notyet
+
 	case rmp440_mode_manual:
-		if (joystickPoll(joy) < 0) {
-			*report = S_rmp440_JOYSTICK_ERROR;
-			break;
-		}
+		Joystick->read(self);
 		ref->x = robot->xRef;
 		ref->y = robot->yRef;
 		ref->theta = robot->theta;
-		getJoystickSpeeds(&vRef, &wRef, &ref->linAccelMax, &ref->angAccelMax);
+		getJoystickSpeeds(Joystick->data(self), data, &vRef, &wRef, 
+		    &ref->linAccelMax, &ref->angAccelMax);
 		ref->v = vRef;
 		ref->w = wRef;
 		break;
-#endif
 
 	case rmp440_mode_track:
 		report = track(ref, robot, *track_mode, &vRef, &wRef, self);
@@ -939,10 +987,19 @@ rmp440InitMain(const rmp440_io *rmp, rmp440_feedback **rs_data,
  *        rmp440_power_cord_connected.
  */
 genom_event
-rmp440JoystickOnStart(genom_context self)
+rmp440JoystickOnStart(const rmp440_Joystick *Joystick,
+                      genom_context self)
 {
-  /* skeleton sample: insert your code */
-  /* skeleton sample */ return rmp440_ether;
+	struct or_joystick_state *joy;
+	
+	if (!Joystick->read(self))
+		return rmp440_joystick_error(self);
+	joy = Joystick->data(self);
+
+	if (joy == NULL)
+		return rmp440_joystick_error(self);
+	
+	return rmp440_main;
 }
 
 /** Codel rmp440JoystickOnMain of activity JoystickOn.
@@ -954,10 +1011,35 @@ rmp440JoystickOnStart(genom_context self)
  *        rmp440_power_cord_connected.
  */
 genom_event
-rmp440JoystickOnMain(genom_context self)
+rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
+                     rmp440_mode rs_mode, genom_context self)
 {
-  /* skeleton sample: insert your code */
-  /* skeleton sample */ return rmp440_ether;
+	struct or_joystick_state *joy;
+	
+	if (!Joystick->read(self))
+		return rmp440_joystick_error(self);
+	joy = Joystick->data(self);
+
+	if (joy == NULL)
+		return rmp440_joystick_error(self);
+	
+	/* Check if mode changed */
+	switch (rs_mode) {
+	case rmp440_mode_power_coord:
+		return rmp440_power_cord_connected(self);
+	case rmp440_mode_emergency:
+		return  rmp440_emergency_stop(self);
+	case rmp440_mode_motors_off:
+		return rmp440_motors_off(self);
+	default:
+		break;
+	}
+	/* Check for user abort */
+	if (joy->buttons._buffer[QUIT_BUTTON]) {
+		printf("Stop joystick\n");
+		return rmp440_inter;
+	}
+	return rmp440_main;
 }
 
 /** Codel rmp440JoystickOnInter of activity JoystickOn.
@@ -969,10 +1051,13 @@ rmp440JoystickOnMain(genom_context self)
  *        rmp440_power_cord_connected.
  */
 genom_event
-rmp440JoystickOnInter(genom_context self)
+rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_ref *ref,
+                      genom_context self)
 {
-  /* skeleton sample: insert your code */
-  /* skeleton sample */ return rmp440_ether;
+	//ref->linAccelMax = rmp_default_maximum_accel;
+	//ref->angAccelMax = rmp_default_maximum_yaw_rate;
+	*rs_mode = rmp440_mode_idle; /* XXXXXX */
+	return rmp440_ether;
 }
 
 
