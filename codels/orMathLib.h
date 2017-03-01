@@ -26,6 +26,8 @@
 #define  C_RAD_DEG           (180./M_PI)
 #define  RAD_TO_DEG(x)       ((x) * C_RAD_DEG)
 
+#define  SIGN(x)             ((x)<0. ? -1. : 1.)
+
 static inline double angleLimit(double angle)
 {
 	return angle > 0 ? fmod(angle+M_PI, 2.0*M_PI) - M_PI :
