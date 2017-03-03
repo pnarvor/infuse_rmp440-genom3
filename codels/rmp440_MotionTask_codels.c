@@ -334,6 +334,7 @@ track(const or_genpos_cart_ref *ref, const or_genpos_cart_state *robot,
 	default:
 		return rmp440_bad_ref(self);
 	}
+#ifdef notyet
 	if (drifted && !prevDrifted) {
 		printf("odoAndAsserv: important drift!\n");
 		printf("ref: %.2lf %.2lf %.2lf\n",
@@ -344,7 +345,7 @@ track(const or_genpos_cart_ref *ref, const or_genpos_cart_state *robot,
 	if (!drifted && prevDrifted)
 		printf("odoAndAsserv: drift cancelled\n");
 	prevDrifted = drifted;
-
+#endif
 	prevV = *vRef;
 	prevW = *wRef;
 	return genom_ok;
