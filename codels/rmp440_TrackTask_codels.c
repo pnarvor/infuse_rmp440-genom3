@@ -52,7 +52,7 @@ pumpSpeedReference(const or_genpos_cart_state *robot,
 	ref->linAccelMax = orders->linAccelMax;
 	ref->angAccelMax = orders->angAccelMax;
 	ref->dataType = or_genpos_speed_data;
-	return rmp440_pause_main;
+	return rmp440_pause_track_main;
 }
 
 
@@ -61,7 +61,7 @@ pumpSpeedReference(const or_genpos_cart_state *robot,
 /** Codel trackStart of activity Track.
  *
  * Triggered by rmp440_start.
- * Yields to rmp440_main, rmp440_end.
+ * Yields to rmp440_track_main, rmp440_end.
  * Throws rmp440_poster_not_found, rmp440_bad_ref,
  *        rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
@@ -72,13 +72,13 @@ trackStart(const rmp440_cmd_vel *cmd_vel, or_genpos_track_mode mode,
 {
 	if (cmd_vel->read(self) != genom_ok)
 		return rmp440_poster_not_found(self);
-	return rmp440_main;
+	return rmp440_track_main;
 }
 
 /** Codel pumpReference of activity Track.
  *
- * Triggered by rmp440_main.
- * Yields to rmp440_pause_main, rmp440_end.
+ * Triggered by rmp440_track_main.
+ * Yields to rmp440_pause_track_main, rmp440_end.
  * Throws rmp440_poster_not_found, rmp440_bad_ref,
  *        rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
@@ -108,7 +108,7 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
 	case or_genpos_track_speed:
 		return pumpSpeedReference(robot, cmd_vel, ref, self);
 	default:
-		return  rmp440_pause_main;
+		return  rmp440_pause_track_main;
 
 	}
 }

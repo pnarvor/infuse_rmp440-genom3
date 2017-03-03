@@ -895,7 +895,7 @@ endOdoAndAsserv(rmp440_io **rmp, rmp440_feedback **rs_data,
 /** Codel rmp440InitStart of activity Init.
  *
  * Triggered by rmp440_start.
- * Yields to rmp440_main.
+ * Yields to rmp440_init_main.
  * Throws rmp440_emergency_stop, rmp440_already_initialized,
  *        rmp440_malloc_error, rmp440_rmplib_error.
  */
@@ -928,12 +928,12 @@ rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
 		return rmp440_rmplib_error(self);
 	}
 	rmp440SetOperationalMode(*rmp, RMP_TRACTOR_REQUEST);
-	return rmp440_main;
+	return rmp440_init_main;
 }
 
 /** Codel rmp440InitMain of activity Init.
  *
- * Triggered by rmp440_main.
+ * Triggered by rmp440_init_main.
  * Yields to rmp440_ether.
  * Throws rmp440_emergency_stop, rmp440_already_initialized,
  *        rmp440_malloc_error, rmp440_rmplib_error.
@@ -950,7 +950,7 @@ rmp440InitMain(const rmp440_io *rmp, rmp440_feedback **rs_data,
 	/* Check motors status */
 	if (data->operational_state != 4) {
 		rmp440CmdNone(rmp);
-		return rmp440_main;
+		return rmp440_init_main;
 	}
 	printf("Motors ON\n");
 	*rs_mode = rmp440_mode_idle;
@@ -983,7 +983,7 @@ rmp440InitMain(const rmp440_io *rmp, rmp440_feedback **rs_data,
 /** Codel rmp440JoystickOnStart of activity JoystickOn.
  *
  * Triggered by rmp440_start.
- * Yields to rmp440_main.
+ * Yields to rmp440_js_main.
  * Throws rmp440_emergency_stop, rmp440_bad_ref, rmp440_rmplib_error,
  *        rmp440_joystick_error, rmp440_motors_off,
  *        rmp440_power_cord_connected.
@@ -1006,13 +1006,13 @@ rmp440JoystickOnStart(const rmp440_Joystick *Joystick,
 	}
 	*rs_mode = rmp440_mode_manual;
 
-	return rmp440_main;
+	return rmp440_js_main;
 }
 
 /** Codel rmp440JoystickOnMain of activity JoystickOn.
  *
- * Triggered by rmp440_main.
- * Yields to rmp440_pause_main, rmp440_inter.
+ * Triggered by rmp440_js_main.
+ * Yields to rmp440_pause_js_main, rmp440_inter.
  * Throws rmp440_emergency_stop, rmp440_bad_ref, rmp440_rmplib_error,
  *        rmp440_joystick_error, rmp440_motors_off,
  *        rmp440_power_cord_connected.
@@ -1050,7 +1050,7 @@ rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
 		printf("Stop joystick\n");
 		return rmp440_inter;
 	}
-	return rmp440_pause_main;
+	return rmp440_pause_js_main;
 }
 
 /** Codel rmp440JoystickOnInter of activity JoystickOn.
