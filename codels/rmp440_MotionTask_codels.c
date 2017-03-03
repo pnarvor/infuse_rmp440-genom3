@@ -537,6 +537,8 @@ getJoystickSpeeds(struct or_joystick_state *joy, rmp440_feedback *data,
 {
 	double vmaxw = -2, vmaxv = -2, againw = -2, againv = -2;
 
+	printf("%s: %d %d\n", __func__,
+	    joy->axes._buffer[V_AXIS], joy->axes._buffer[W_AXIS]);
 	if (joy->buttons._buffer[MOVE_BUTTON_SLOW]) {
 		vmaxw = 0.7; vmaxv = 0.5; againw = 0.5; againv = 0.6;
 	}
@@ -1066,6 +1068,7 @@ rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_ref *ref,
 {
 	//ref->linAccelMax = rmp_default_maximum_accel;
 	//ref->angAccelMax = rmp_default_maximum_yaw_rate;
+	printf("%s\n", __func__);
 	*rs_mode = rmp440_mode_idle; /* XXXXXX */
 	return rmp440_ether;
 }
