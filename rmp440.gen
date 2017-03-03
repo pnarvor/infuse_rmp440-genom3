@@ -135,8 +135,8 @@ component rmp440 {
   activity JoystickOn() {
     doc "Activate joystick motion mode";
     task MotionTask;
-    codel <start>rmp440JoystickOnStart(in Joystick) yield ether, main, inter;
-    codel <main>rmp440JoystickOnMain(in Joystick, in rs_mode) yield ether, inter;
+    codel <start>rmp440JoystickOnStart(in Joystick, inout rs_mode) yield main;
+    codel <main>rmp440JoystickOnMain(in Joystick, in rs_mode) yield pause::main, inter;
     codel <inter>rmp440JoystickOnInter(out rs_mode, out ref) yield ether;
     throw bad_ref, rmplib_error, joystick_error, motors_off,
       emergency_stop, power_cord_connected;

@@ -981,31 +981,36 @@ rmp440InitMain(const rmp440_io *rmp, rmp440_feedback **rs_data,
 /** Codel rmp440JoystickOnStart of activity JoystickOn.
  *
  * Triggered by rmp440_start.
- * Yields to rmp440_ether, rmp440_main, rmp440_inter.
+ * Yields to rmp440_main.
  * Throws rmp440_emergency_stop, rmp440_bad_ref, rmp440_rmplib_error,
  *        rmp440_joystick_error, rmp440_motors_off,
  *        rmp440_power_cord_connected.
  */
 genom_event
 rmp440JoystickOnStart(const rmp440_Joystick *Joystick,
-                      genom_context self)
+                      rmp440_mode *rs_mode, genom_context self)
 {
 	struct or_joystick_state *joy;
 	
-	if (!Joystick->read(self))
+	if (Joystick->read(self)) {
+		printf("%s: read joystick failed\n", __func__);
 		return rmp440_joystick_error(self);
+	}
 	joy = Joystick->data(self);
 
-	if (joy == NULL)
+	if (joy == NULL) {
+		printf("%s: joystick data failed\n", __func__);
 		return rmp440_joystick_error(self);
-	
+	}
+	*rs_mode = rmp440_mode_manual;
+
 	return rmp440_main;
 }
 
 /** Codel rmp440JoystickOnMain of activity JoystickOn.
  *
  * Triggered by rmp440_main.
- * Yields to rmp440_ether, rmp440_inter.
+ * Yields to rmp440_main, rmp440_inter.
  * Throws rmp440_emergency_stop, rmp440_bad_ref, rmp440_rmplib_error,
  *        rmp440_joystick_error, rmp440_motors_off,
  *        rmp440_power_cord_connected.
@@ -1016,12 +1021,16 @@ rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
 {
 	struct or_joystick_state *joy;
 	
-	if (!Joystick->read(self))
+	if (Joystick->read(self)) {
+		printf("%s: read joystick failed\n", __func__);
 		return rmp440_joystick_error(self);
+	}
 	joy = Joystick->data(self);
 
-	if (joy == NULL)
+	if (joy == NULL) {
+		printf("%s: joystick data failed\n", __func__);
 		return rmp440_joystick_error(self);
+	}
 	
 	/* Check if mode changed */
 	switch (rs_mode) {
@@ -1039,7 +1048,7 @@ rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
 		printf("Stop joystick\n");
 		return rmp440_inter;
 	}
-	return rmp440_main;
+	return rmp440_pause_main;
 }
 
 /** Codel rmp440JoystickOnInter of activity JoystickOn.
