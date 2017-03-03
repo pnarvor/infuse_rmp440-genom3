@@ -697,7 +697,6 @@ odoAndAsserv(const rmp440_io *rmp,
 #if DEBUG>=1
 	static int count = 0;
 #endif
-
 	if (rmp == NULL)
 		return rmp440_pause_odo; /* not initialized yet */
 
@@ -1013,7 +1012,7 @@ rmp440JoystickOnStart(const rmp440_Joystick *Joystick,
 /** Codel rmp440JoystickOnMain of activity JoystickOn.
  *
  * Triggered by rmp440_main.
- * Yields to rmp440_main, rmp440_inter.
+ * Yields to rmp440_pause_main, rmp440_inter.
  * Throws rmp440_emergency_stop, rmp440_bad_ref, rmp440_rmplib_error,
  *        rmp440_joystick_error, rmp440_motors_off,
  *        rmp440_power_cord_connected.
