@@ -912,8 +912,11 @@ rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
 	if (fe == NULL)
 		return rmp440_malloc_error(self);
 	*rs_data = rmp440FeedbackInit(NULL);
-	if (*rs_data == NULL)
+	if (*rs_data == NULL) {
+		fe_end(*fe);
+		*fe = NULL;
 		return rmp440_malloc_error(self);
+	}
 
 	if (device[0] == '/') /* /dev/ttyACM0 */
 		*rmp = rmp440Init(RMP440_INTERFACE_USB, device);
@@ -925,6 +928,10 @@ rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
 		*rmp = rmp440Init(RMP440_INTERFACE_FAKE, device+5);
 
 	if (*rmp == NULL) {
+		free(*rs_data);
+		*rs_data = NULL;
+		fe_end(*fe);
+		*fe = NULL;
 		return rmp440_rmplib_error(self);
 	}
 	rmp440SetOperationalMode(*rmp, RMP_TRACTOR_REQUEST);
