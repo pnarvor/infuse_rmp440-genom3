@@ -934,7 +934,7 @@ rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
 /** Codel rmp440InitMain of activity Init.
  *
  * Triggered by rmp440_init_main.
- * Yields to rmp440_ether.
+ * Yields to rmp440_pause_init_main, rmp440_ether.
  * Throws rmp440_emergency_stop, rmp440_already_initialized,
  *        rmp440_malloc_error, rmp440_rmplib_error.
  */
@@ -950,7 +950,7 @@ rmp440InitMain(const rmp440_io *rmp, rmp440_feedback **rs_data,
 	/* Check motors status */
 	if (data->operational_state != 4) {
 		rmp440CmdNone(rmp);
-		return rmp440_init_main;
+		return rmp440_pause_init_main;
 	}
 	printf("Motors ON\n");
 	*rs_mode = rmp440_mode_idle;

@@ -120,12 +120,13 @@ component rmp440 {
     doc "Connect to RMP440 robot";
     codel <start>rmp440InitStart(in device,
 				 out rmp, out fe, out rs_data)
-      yield main;
-    codel <main>rmp440InitMain(in rmp,
+      yield init_main;
+    codel <init_main>rmp440InitMain(in rmp,
 			       out rs_data,
 			       out rs_mode,
 			       out dynamics,
-			       out kinematics) yield ether;
+				    out kinematics)
+      yield pause::init_main, ether;
     throw already_initialized, malloc_error, rmplib_error;
     task MotionTask;
   };
@@ -135,8 +136,10 @@ component rmp440 {
   activity JoystickOn() {
     doc "Activate joystick motion mode";
     task MotionTask;
-    codel <start>rmp440JoystickOnStart(in Joystick, inout rs_mode) yield main;
-    codel <main>rmp440JoystickOnMain(in Joystick, in rs_mode) yield pause::main, inter;
+    codel <start>rmp440JoystickOnStart(in Joystick, inout rs_mode) 
+      yield js_main;
+    codel <js_main>rmp440JoystickOnMain(in Joystick, in rs_mode) 
+      yield pause::js_main, inter;
     codel <inter>rmp440JoystickOnInter(out rs_mode, out ref) yield ether;
     throw bad_ref, rmplib_error, joystick_error, motors_off,
       emergency_stop, power_cord_connected;
@@ -148,12 +151,12 @@ component rmp440 {
   activity Track(in or::genpos::track_mode mode = 
 		 or::genpos::track_speed: "Tracking mode") {
     doc  "Start tracking a reference poster";
-    codel <start>trackStart(port in cmd_vel, in mode) yield main, end;
-    codel <main>pumpReference(in robot,
+    codel <start>trackStart(port in cmd_vel, in mode) yield track_main, end;
+    codel <track_main>pumpReference(in robot,
 			      in rs_mode,
 			      in track_mode,
 			      port in cmd_vel,
-			      out ref) yield pause::main, end;
+			      out ref) yield pause::track_main, end;
     codel <end>smoothStopTrack(in robot,
 			       in dynamics,
 			       inout rs_mode,
