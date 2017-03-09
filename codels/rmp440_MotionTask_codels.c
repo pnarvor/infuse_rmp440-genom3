@@ -87,7 +87,7 @@ rmp440DataUpdate(rmp440_feedback *data, FE_STR *fe,
 	status->rs_data.frame_count = data->frame_count;
 	status->rs_data.operational_state = data->operational_state;
 	status->rs_data.dynamic_response = data->dynamic_response;
-	status->rs_data.min_propulsion_batt_soc = 
+	status->rs_data.min_propulsion_batt_soc =
 	    data->min_propulsion_batt_soc;
 	status->rs_data.aux_batt_soc = data->aux_batt_soc;
 	status->rs_data.inertial_x_acc = data->inertial_x_acc;
@@ -105,7 +105,7 @@ rmp440DataUpdate(rmp440_feedback *data, FE_STR *fe,
 	status->rs_data.vel_limit = data->vel_limit;
 	status->rs_data.linear_accel = data->linear_accel;
 	status->rs_data.linear_vel = data->linear_vel;
-	status->rs_data.differential_wheel_vel = 
+	status->rs_data.differential_wheel_vel =
 	    data->differential_wheel_vel;
 	status->rs_data.right_front_vel = data->right_front_vel;
 	status->rs_data.left_front_vel = data->left_front_vel;
@@ -121,23 +121,23 @@ rmp440DataUpdate(rmp440_feedback *data, FE_STR *fe,
 	status->rs_data.right_rear_current = data->right_rear_current;
 	status->rs_data.left_rear_current = data->left_rear_current;
 	status->rs_data.max_motor_current = data->max_motor_current;
-	status->rs_data.right_front_current_limit = 
+	status->rs_data.right_front_current_limit =
 	    data->right_front_current_limit;
-	status->rs_data.left_front_current_limit = 
+	status->rs_data.left_front_current_limit =
 	    data->left_front_current_limit;
-	status->rs_data.right_rear_current_limit = 
+	status->rs_data.right_rear_current_limit =
 	    data->right_rear_current_limit;
-	status->rs_data.left_rear_current_limit = 
+	status->rs_data.left_rear_current_limit =
 	    data->left_rear_current_limit;
-	status->rs_data.min_motor_current_limit = 
+	status->rs_data.min_motor_current_limit =
 	    data->min_motor_current_limit;
 	status->rs_data.front_base_batt_1_soc = data->front_base_batt_1_soc;
 	status->rs_data.front_base_batt_2_soc = data->front_base_batt_2_soc;
 	status->rs_data.rear_base_batt_1_soc = data->rear_base_batt_1_soc;
 	status->rs_data.rear_base_batt_2_soc = data->rear_base_batt_2_soc;
-	status->rs_data.front_base_batt_1_temp = 
+	status->rs_data.front_base_batt_1_temp =
 	    data->front_base_batt_1_temp;
-	status->rs_data.front_base_batt_2_temp = 
+	status->rs_data.front_base_batt_2_temp =
 	    data->front_base_batt_2_temp;
 	status->rs_data.rear_base_batt_1_temp = data->rear_base_batt_1_temp;
 	status->rs_data.rear_base_batt_2_temp = data->rear_base_batt_2_temp;
@@ -150,7 +150,7 @@ rmp440DataUpdate(rmp440_feedback *data, FE_STR *fe,
 	status->rs_data.abb_system_status = data->abb_system_status;
 	status->rs_data.abb_batt_status = data->abb_batt_status;
 	status->rs_data.aux_batt_faults = data->aux_batt_faults;
-	status->rs_data.ccu_7p2_battery_voltage = 
+	status->rs_data.ccu_7p2_battery_voltage =
 	    data->ccu_7p2_battery_voltage;
 	status->rs_data.sp_sw_build_id = data->sp_sw_build_id;
 	status->rs_data.uip_sw_build_id = data->uip_sw_build_id;
@@ -164,24 +164,24 @@ rmp440DataUpdate(rmp440_feedback *data, FE_STR *fe,
 	status->rs_data.fram_yaw_rate_limit = data->fram_yaw_rate_limit;
 	status->rs_data.fram_yaw_accel_limit = data->fram_yaw_accel_limit;
 	status->rs_data.fram_tire_diameter = data->fram_tire_diameter;
-	status->rs_data.fram_wheel_base_length = 
+	status->rs_data.fram_wheel_base_length =
 	    data->fram_wheel_base_length;
-	status->rs_data.fram_wheel_track_width = 
+	status->rs_data.fram_wheel_track_width =
 	    data->fram_wheel_track_width;
-	status->rs_data.fram_transmission_ratio = 
+	status->rs_data.fram_transmission_ratio =
 	    data->fram_transmission_ratio;
 	status->rs_data.fram_config_bitmap = data->fram_config_bitmap;
 	status->rs_data.fram_eth_ip_address = data->fram_eth_ip_address;
 	status->rs_data.fram_eth_port_number = data->fram_eth_port_number;
 	status->rs_data.fram_eth_subnet_mask = data->fram_eth_subnet_mask;
 	status->rs_data.fram_eth_gateway = data->fram_eth_gateway;
-	status->rs_data.user_feedback_bitmap[0] = 
+	status->rs_data.user_feedback_bitmap[0] =
 	    data->user_feedback_bitmap[0];
-	status->rs_data.user_feedback_bitmap[1] = 
+	status->rs_data.user_feedback_bitmap[1] =
 	    data->user_feedback_bitmap[1];
-	status->rs_data.user_feedback_bitmap[2] = 
+	status->rs_data.user_feedback_bitmap[2] =
 	    data->user_feedback_bitmap[2];
-	status->rs_data.user_feedback_bitmap[3] = 
+	status->rs_data.user_feedback_bitmap[3] =
 	    data->user_feedback_bitmap[3];
 
 
@@ -574,8 +574,8 @@ getJoystickSpeeds(struct or_joystick_state *joy, rmp440_feedback *data,
  */
 genom_event
 initOdoAndAsserv(rmp440_ids *ids,
-                 const rmp440_StatusGeneric *StatusGeneric,
-                 genom_context self)
+		 const rmp440_StatusGeneric *StatusGeneric,
+		 genom_context self)
 {
 	rmp_status_str *statusgen = StatusGeneric->data(self);
 	rmp440_kinematics_str *kinematics = &ids->kinematics;
@@ -672,17 +672,17 @@ initOdoAndAsserv(rmp440_ids *ids,
  */
 genom_event
 odoAndAsserv(const rmp440_io *rmp,
-             const rmp440_kinematics_str *kinematics,
-             const rmp440_var_params *var_params,
-             const rmp440_Joystick *Joystick, GYRO_DATA **gyroId,
-             FE_STR **fe, or_genpos_cart_state *robot,
-             or_genpos_cart_ref *ref, rmp440_max_accel *max_accel,
-             or_genpos_track_mode *track_mode,
-             rmp440_feedback **rs_data, rmp440_mode *rs_mode,
-             rmp440_gyro *gyro, rmp440_gyro_asserv *gyro_asserv,
-             const rmp440_Odo *Odo, const rmp440_Status *Status,
-             const rmp440_StatusGeneric *StatusGeneric,
-             genom_context self)
+	     const rmp440_kinematics_str *kinematics,
+	     const rmp440_var_params *var_params,
+	     const rmp440_Joystick *Joystick, GYRO_DATA **gyroId,
+	     FE_STR **fe, or_genpos_cart_state *robot,
+	     or_genpos_cart_ref *ref, rmp440_max_accel *max_accel,
+	     or_genpos_track_mode *track_mode,
+	     rmp440_feedback **rs_data, rmp440_mode *rs_mode,
+	     rmp440_gyro *gyro, rmp440_gyro_asserv *gyro_asserv,
+	     const rmp440_Odo *Odo, const rmp440_Status *Status,
+	     const rmp440_StatusGeneric *StatusGeneric,
+	     genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
 	double direction;
@@ -811,7 +811,7 @@ odoAndAsserv(const rmp440_io *rmp,
 		ref->x = robot->xRef;
 		ref->y = robot->yRef;
 		ref->theta = robot->theta;
-		getJoystickSpeeds(Joystick->data(self), data, &vRef, &wRef, 
+		getJoystickSpeeds(Joystick->data(self), data, &vRef, &wRef,
 		    &ref->linAccelMax, &ref->angAccelMax);
 		ref->v = vRef;
 		ref->w = wRef;
@@ -874,7 +874,7 @@ odoAndAsserv(const rmp440_io *rmp,
  */
 genom_event
 endOdoAndAsserv(rmp440_io **rmp, rmp440_feedback **rs_data,
-                genom_context self)
+		genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
 
@@ -901,7 +901,7 @@ endOdoAndAsserv(rmp440_io **rmp, rmp440_feedback **rs_data,
  */
 genom_event
 rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
-                rmp440_feedback **rs_data, genom_context self)
+		rmp440_feedback **rs_data, genom_context self)
 {
 	/* error if already connected */
 	if (*rmp != NULL || *rs_data != NULL)
@@ -990,10 +990,10 @@ rmp440InitMain(const rmp440_io *rmp, rmp440_feedback **rs_data,
  */
 genom_event
 rmp440JoystickOnStart(const rmp440_Joystick *Joystick,
-                      rmp440_mode *rs_mode, genom_context self)
+		      rmp440_mode *rs_mode, genom_context self)
 {
 	struct or_joystick_state *joy;
-	
+
 	if (Joystick->read(self)) {
 		printf("%s: read joystick failed\n", __func__);
 		return rmp440_joystick_error(self);
@@ -1019,10 +1019,10 @@ rmp440JoystickOnStart(const rmp440_Joystick *Joystick,
  */
 genom_event
 rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
-                     rmp440_mode rs_mode, genom_context self)
+		     rmp440_mode rs_mode, genom_context self)
 {
 	struct or_joystick_state *joy;
-	
+
 	if (Joystick->read(self)) {
 		printf("%s: read joystick failed\n", __func__);
 		return rmp440_joystick_error(self);
@@ -1033,7 +1033,7 @@ rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
 		printf("%s: joystick data failed\n", __func__);
 		return rmp440_joystick_error(self);
 	}
-	
+
 	/* Check if mode changed */
 	switch (rs_mode) {
 	case rmp440_mode_power_coord:
@@ -1063,7 +1063,7 @@ rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
  */
 genom_event
 rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_ref *ref,
-                      genom_context self)
+		      genom_context self)
 {
 	//ref->linAccelMax = rmp_default_maximum_accel;
 	//ref->angAccelMax = rmp_default_maximum_yaw_rate;
@@ -1083,8 +1083,8 @@ rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_ref *ref,
  */
 genom_event
 rmp440GyroExec(const rmp440_gyro_params *params,
-               const or_genpos_cart_state *robot, rmp440_gyro *gyro,
-               GYRO_DATA **gyroId, genom_context self)
+	       const or_genpos_cart_state *robot, rmp440_gyro *gyro,
+	       GYRO_DATA **gyroId, genom_context self)
 {
 
 	if (*gyroId == NULL) {
