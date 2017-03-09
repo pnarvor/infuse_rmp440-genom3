@@ -701,6 +701,7 @@ odoAndAsserv(const rmp440_io *rmp,
 		return rmp440_pause_odo; /* not initialized yet */
 
 	if (rmp440ReceiveAndDecode(rmp, data) < 0) {
+		printf("no data??\n");
 		/* Probably motors OFF - no communication on the RMP440 */
 		status->rs_mode = statusgen->rs_mode = rmp440_mode_motors_off;
 		rmp440CmdNone(rmp);
@@ -936,6 +937,7 @@ rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
 		return rmp440_rmplib_error(self);
 	}
 	rmp440SetOperationalMode(*rmp, RMP_TRACTOR_REQUEST);
+	printf("-- sent tractor request\n");
 	return rmp440_init_main;
 }
 
