@@ -703,6 +703,7 @@ odoAndAsserv(const rmp440_io *rmp,
 	if (rmp440ReceiveAndDecode(rmp, data) < 0) {
 		/* Probably motors OFF - no communication on the RMP440 */
 		status->rs_mode = statusgen->rs_mode = rmp440_mode_motors_off;
+		rmp440CmdNone(rmp);
 		return rmp440_pause_odo;
 	}
 
@@ -966,7 +967,9 @@ rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
 
 	/* Check motors status */
 	if (data->operational_state != 4) {
-		rmp440CmdNone(rmp);
+		printf("-- init_main: operational_state != 4 %d\n",
+		    data->operational_state);
+		rmp440SetOperationalMode(*rmp, RMP_TRACTOR_REQUEST);
 		return rmp440_pause_init_main;
 	}
 	printf("Motors ON\n");
@@ -991,6 +994,7 @@ rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
 		printf("WARNING fram_accel_limit != fram_decel_limit %f %f\n",
 		    data->fram_accel_limit, data->fram_decel_limit);
 
+	rmp440CmdNone(*rmp);
 	return rmp440_ether;
 }
 
