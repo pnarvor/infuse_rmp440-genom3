@@ -121,10 +121,11 @@ component rmp440 {
     codel <start>rmp440InitStart(in device,
 				 out rmp, out fe, out rs_data)
       yield init_main;
-    codel <init_main>rmp440InitMain(in rmp,
-			       out rs_data,
-			       out rs_mode,
-			       out dynamics,
+    codel <init_main>rmp440InitMain(inout rmp,
+				    inout fe,
+				    out rs_data,
+				    out rs_mode,
+				    out dynamics,
 				    out kinematics)
       yield pause::init_main, ether;
     throw already_initialized, malloc_error, rmplib_error;

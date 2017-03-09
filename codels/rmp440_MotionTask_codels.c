@@ -946,13 +946,23 @@ rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
  *        rmp440_malloc_error, rmp440_rmplib_error.
  */
 genom_event
-rmp440InitMain(const rmp440_io *rmp, rmp440_feedback **rs_data,
-               rmp440_mode *rs_mode, rmp440_dynamic_str *dynamics,
-               rmp440_kinematics_str *kinematics, genom_context self)
+rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
+	       rmp440_mode *rs_mode, rmp440_dynamic_str *dynamics,
+	       rmp440_kinematics_str *kinematics, genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
 
-	rmp440ReceiveAndDecode(rmp, data);
+	printf("-- init_main: receiveAndDecode\n");
+	if (rmp440ReceiveAndDecode(*rmp, data) < 0) {
+		printf("-- receiveAndDecode return -1 errno: %d\n", errno);
+		rmp440End(*rmp);
+		*rmp = NULL;
+		free(*rs_data);
+		*rs_data = NULL;
+		fe_end(*fe);
+		*fe = NULL;
+		return rmp440_rmplib_error(self);
+	}
 
 	/* Check motors status */
 	if (data->operational_state != 4) {
