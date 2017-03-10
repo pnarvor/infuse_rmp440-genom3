@@ -320,8 +320,8 @@ odoAndAsserv(const rmp440_io *rmp,
 	struct timespec tv;
 	clock_gettime(CLOCK_REALTIME, &tv);
 	double t = tv.tv_sec + tv.tv_nsec*1e-9;
-	//if (SDI_F->status.rs_mode == RMP440_TRACK)
-	bound_accels(max_accel, t, &vRef, &wRef);
+	if (*rs_mode == rmp440_mode_track)
+		bound_accels(max_accel, t, &vRef, &wRef);
 
 	if (gyro->gyroOn)
 		control_yaw(gyro_asserv, t, vRef, wRef,
