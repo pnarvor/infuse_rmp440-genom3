@@ -136,10 +136,6 @@ initOdoAndAsserv(rmp440_ids *ids,
 	/* max accel */
 	max_accel->prev_vel_command = 0.;
 	max_accel->prev_vel_command_t = -1.;
-#ifdef notyet
-	/* Initialize Pom */
-	initPomPosters();
-#endif
 
 	return rmp440_odo;
 }
@@ -338,11 +334,6 @@ odoAndAsserv(const rmp440_io *rmp,
 	Odo->write(self);
 	Status->write(self);
 	StatusGeneric->write(self);
-
-#ifdef notyet
-	updatePomPosters();
-#endif
-
 
 	return rmp440_pause_odo;
 }
