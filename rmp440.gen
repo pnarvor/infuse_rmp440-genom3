@@ -24,6 +24,7 @@
 
 #include "rmp440Struct.idl"
 #include "or/hid/joystick.gen"
+#include "or/pose/pose_estimator.gen"
 
 component rmp440 {
   version "0.1";
@@ -52,6 +53,7 @@ component rmp440 {
   port in or::genpos::cart_speed cmd_vel;
   port in or_joystick::state Joystick;
   port out odo_str Odo;
+  port out or_pose_estimator::state Pose;
   port out status_str Status;
   port out rmp::status_str StatusGeneric;
 
@@ -102,6 +104,7 @@ component rmp440 {
 			    out gyro,
 			    out gyro_asserv,
 			    out Odo,
+			    out Pose,
 			    out Status,
 			    out StatusGeneric) yield ether, pause::odo, end;
     codel <end>endOdoAndAsserv(inout rmp, inout rs_data) yield ether;
