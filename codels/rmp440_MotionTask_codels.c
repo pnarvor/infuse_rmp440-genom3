@@ -55,8 +55,8 @@
  */
 genom_event
 initOdoAndAsserv(rmp440_ids *ids,
-		 const rmp440_StatusGeneric *StatusGeneric,
-		 genom_context self)
+                 const rmp440_StatusGeneric *StatusGeneric,
+                 genom_context self)
 {
 	rmp_status_str *statusgen = StatusGeneric->data(self);
 	rmp440_kinematics_str *kinematics = &ids->kinematics;
@@ -149,23 +149,25 @@ initOdoAndAsserv(rmp440_ids *ids,
  */
 genom_event
 odoAndAsserv(const rmp440_io *rmp,
-	     const rmp440_kinematics_str *kinematics,
-	     const rmp440_var_params *var_params,
-	     const rmp440_Joystick *Joystick, GYRO_DATA **gyroId,
-	     FE_STR **fe, or_genpos_cart_state *robot,
-	     or_genpos_cart_ref *ref, rmp440_max_accel *max_accel,
-	     or_genpos_track_mode *track_mode,
-	     rmp440_feedback **rs_data, rmp440_mode *rs_mode,
-	     rmp440_gyro *gyro, rmp440_gyro_asserv *gyro_asserv,
-	     const rmp440_Odo *Odo, const rmp440_Status *Status,
-	     const rmp440_StatusGeneric *StatusGeneric,
-	     genom_context self)
+             const rmp440_kinematics_str *kinematics,
+             const rmp440_var_params *var_params,
+             const rmp440_Joystick *Joystick, GYRO_DATA **gyroId,
+             FE_STR **fe, or_genpos_cart_state *robot,
+             or_genpos_cart_ref *ref, rmp440_max_accel *max_accel,
+             or_genpos_track_mode *track_mode,
+             rmp440_feedback **rs_data, rmp440_mode *rs_mode,
+             rmp440_gyro *gyro, rmp440_gyro_asserv *gyro_asserv,
+             const rmp440_Odo *Odo, const rmp440_Pose *Pose,
+             const rmp440_Status *Status,
+             const rmp440_StatusGeneric *StatusGeneric,
+             genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
 	double direction;
 	uint32_t date;
 	rmp440_status_str *status = Status->data(self);
 	rmp_status_str *statusgen = StatusGeneric->data(self);
+	or_pose_estimator_state *pose = Pose->data(self);
 	double vRef, wRef;
 	double vCommand, wCommand;
 	genom_event report = genom_ok;
@@ -202,6 +204,7 @@ odoAndAsserv(const rmp440_io *rmp,
 	odoProba(robot, var,
 	    kinematics->axisWidth, var_params->coeffLinAng,
 	    rmp440_sec_period);
+
 
 	/* Gyro */
 	if (gyroId != NULL /* && gyro->currentMode != RMP440_GYRO_OFF */) {
@@ -266,6 +269,20 @@ odoAndAsserv(const rmp440_io *rmp,
 	if (odometryMode == RMP440_ODO_3D)
 		rmp440Odo3d(EXEC_TASK_PERIOD(RMP440_MOTIONTASK_NUM));
 #endif
+	/* fill pose */
+	pose->intrinsic = true;
+	pose->pos._present = true;
+	pose->pos._value.x = robot->xRob;
+	pose->pos._value.y = robot->yRob;
+	pose->pos._value.z = 0.0; 	/* XXXX */
+	pose->vel._present = true;
+	pose->vel._value.vx = robot->v;
+	pose->vel._value.vy = 0;
+	pose->vel._value.vz = 0;
+	pose->vel._value.wx = 0;	/* XXX */
+	pose->vel._value.wy = 0;	/* XXX */
+	pose->vel._value.wz = robot->w;
+
 	/*
 	 * Asserv
 	 */
@@ -331,6 +348,7 @@ odoAndAsserv(const rmp440_io *rmp,
 
 	/* publish */
 	memcpy(&Odo->data(self)->robot, robot, sizeof(or_genpos_cart_state));
+	Pose->write(self);
 	Odo->write(self);
 	Status->write(self);
 	StatusGeneric->write(self);
@@ -347,7 +365,7 @@ odoAndAsserv(const rmp440_io *rmp,
  */
 genom_event
 endOdoAndAsserv(rmp440_io **rmp, rmp440_feedback **rs_data,
-		genom_context self)
+                genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
 
@@ -374,7 +392,7 @@ endOdoAndAsserv(rmp440_io **rmp, rmp440_feedback **rs_data,
  */
 genom_event
 rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
-		rmp440_feedback **rs_data, genom_context self)
+                rmp440_feedback **rs_data, genom_context self)
 {
 	/* error if already connected */
 	if (*rmp != NULL || *rs_data != NULL)
@@ -421,8 +439,8 @@ rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
  */
 genom_event
 rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
-	       rmp440_mode *rs_mode, rmp440_dynamic_str *dynamics,
-	       rmp440_kinematics_str *kinematics, genom_context self)
+               rmp440_mode *rs_mode, rmp440_dynamic_str *dynamics,
+               rmp440_kinematics_str *kinematics, genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
 
@@ -484,7 +502,7 @@ rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
  */
 genom_event
 rmp440JoystickOnStart(const rmp440_Joystick *Joystick,
-		      rmp440_mode *rs_mode, genom_context self)
+                      rmp440_mode *rs_mode, genom_context self)
 {
 	struct or_joystick_state *joy;
 
@@ -513,7 +531,7 @@ rmp440JoystickOnStart(const rmp440_Joystick *Joystick,
  */
 genom_event
 rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
-		     rmp440_mode rs_mode, genom_context self)
+                     rmp440_mode rs_mode, genom_context self)
 {
 	struct or_joystick_state *joy;
 
@@ -557,7 +575,7 @@ rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
  */
 genom_event
 rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_ref *ref,
-		      genom_context self)
+                      genom_context self)
 {
 	//ref->linAccelMax = rmp_default_maximum_accel;
 	//ref->angAccelMax = rmp_default_maximum_yaw_rate;
@@ -577,8 +595,8 @@ rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_ref *ref,
  */
 genom_event
 rmp440GyroExec(const rmp440_gyro_params *params,
-	       const or_genpos_cart_state *robot, rmp440_gyro *gyro,
-	       GYRO_DATA **gyroId, genom_context self)
+               const or_genpos_cart_state *robot, rmp440_gyro *gyro,
+               GYRO_DATA **gyroId, genom_context self)
 {
 
 	if (*gyroId == NULL) {
