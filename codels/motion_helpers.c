@@ -264,9 +264,10 @@ rmp440VelocitySet(const rmp440_io *rmp, const rmp440_feedback *data,
 	if (data->operational_state == 4) {
 #if DEBUG > 1
 		printf("rmp440Motion(rmp, %lf, %lf)\n", v, w);
-#endif
-		//rmp440Motion(rmp, v, w);
 		rmp440CmdNone(rmp);
+#else
+		rmp440Motion(rmp, v, w);
+#endif
 	} else
 		rmp440CmdNone(rmp);
 }
