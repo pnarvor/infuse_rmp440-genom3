@@ -270,6 +270,8 @@ odoAndAsserv(const rmp440_io *rmp,
 		rmp440Odo3d(EXEC_TASK_PERIOD(RMP440_MOTIONTASK_NUM));
 #endif
 	/* fill pose */
+	pose->ts.sec = data->timestamp.tv_sec;
+	pose->ts.nsec = data->timestamp.tv_nsec;
 	pose->intrinsic = true;
 	pose->pos._present = true;
 	pose->pos._value.x = robot->xRob;
