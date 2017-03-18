@@ -336,9 +336,7 @@ odoAndAsserv(const rmp440_io *rmp,
 	// SDI_F->vReference = vRef;
 	// SDI_F->wReference = wRef;
 
-	struct timespec tv;
-	clock_gettime(CLOCK_REALTIME, &tv);
-	double t = tv.tv_sec + tv.tv_nsec*1e-9;
+	double t = data->timestamp.tv_sec + data->timestamp.tv_nsec*1e-9;
 	if (*rs_mode == rmp440_mode_track)
 		bound_accels(max_accel, t, &vRef, &wRef);
 
