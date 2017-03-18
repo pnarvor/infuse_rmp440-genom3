@@ -32,7 +32,7 @@ native GYRO_DATA;
 
 module rmp440 {
 
-  const double sec_period = 0.05; // 50ms
+  const double sec_period = 0.05; // 50ms -- MCU RTT is ~30ms
 
   const double delay_gyro_omega = 0.3; // delay between command and measure, in seconds
   const double kp_gyro_omega = 2.0;
