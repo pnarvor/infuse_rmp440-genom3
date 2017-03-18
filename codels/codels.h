@@ -16,7 +16,7 @@
 #ifndef _CODELS_H
 #define _CODELS_H
 
-#define DEBUG 2
+#define DEBUG 1
 
 typedef struct rmp440_log_str {
 	FILE *out;
