@@ -30,7 +30,7 @@ component rmp440 {
   version "0.1";
   email "openrobots@laas.fr";
   lang "c";
-  codels-require "rmp440-libs, gyro-libs, felib";
+  codels-require "rmp440-libs >= 0.5, gyro-libs, felib";
 
   exception already_initialized;
   exception malloc_error;

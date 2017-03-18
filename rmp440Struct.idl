@@ -20,6 +20,10 @@
  **
  **/
 
+#pragma require "openrobots-idl >= 1.1"
+
+#include <or/time/time.idl>
+
 /* internal structure for communication with RMP440 */
 native rmp440_io;
 native rmp440_feedback;
@@ -63,6 +67,7 @@ module rmp440 {
 
 /* copy-paste of rmp440.h:rmp440_feedback */
   struct feedback_genom {
+    or::time::ts timestamp;
     unsigned long fault_status[4];
     unsigned long mcu_fault_status[4];
 	float frame_count;
