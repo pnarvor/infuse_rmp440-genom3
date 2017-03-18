@@ -180,7 +180,6 @@ odoAndAsserv(const rmp440_io *rmp,
 		return rmp440_pause_odo; /* not initialized yet */
 
 	if (rmp440ReceiveAndDecode(rmp, data) < 0) {
-		printf("no data??\n");
 		/* Probably motors OFF - no communication on the RMP440 */
 		status->rs_mode = statusgen->rs_mode = rmp440_mode_motors_off;
 		rmp440CmdNone(rmp);
@@ -203,8 +202,7 @@ odoAndAsserv(const rmp440_io *rmp,
 
 	odoProba(robot, var,
 	    kinematics->axisWidth, var_params->coeffLinAng,
-	    rmp440_sec_period);
-
+	    rmp440_sec_period);	/* XXX could use the actual measured period */
 
 	/* Gyro */
 	if (gyroId != NULL /* && gyro->currentMode != RMP440_GYRO_OFF */) {
