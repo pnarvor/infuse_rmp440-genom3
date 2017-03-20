@@ -8,6 +8,8 @@ librmp440_codels_la_SOURCES+=	rmp440_TrackTask_codels.c
 librmp440_codels_la_SOURCES+=	codels.h joystick.c motion_helpers.c \
 				odoProba.c odoProba.h orMathLib.h track.c
 
+librmp440_codels_la_SOURCES+=	rmp440_Log.c rmp440_Log.h
+
 librmp440_codels_la_CPPFLAGS=	$(requires_CFLAGS)
 librmp440_codels_la_LDFLAGS=	$(requires_LIBS)
 librmp440_codels_la_LDFLAGS+=	-release $(PACKAGE_VERSION)

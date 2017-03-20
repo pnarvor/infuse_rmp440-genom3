@@ -23,6 +23,9 @@
 
 #include "rmp440_c_types.h"
 #include "codels.h"
+
+#include "rmp440_Log.h"
+
 /* --- Function log ----------------------------------------------------- */
 
 /** Codel log_start of function log.
@@ -41,7 +44,7 @@ log_start(const char path[64], rmp440_log_str **log,
 	f = fopen(path, "w");
 	if (f == NULL) 
 		return rmp440_sys_error(self);
-	fprintf(f, rmp440_log_header "\n");
+	fprintf(f, rmp440_feedback_header "\n");
 
 	*log = malloc(sizeof(**log));
 	if (*log == NULL) {

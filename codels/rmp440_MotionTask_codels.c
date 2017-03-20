@@ -42,6 +42,7 @@
 #include "orMathLib.h"
 #include "odoProba.h"
 #include "codels.h"
+#include "rmp440_Log.h"
 
 /* --- Task MotionTask -------------------------------------------------- */
 
@@ -151,14 +152,15 @@ genom_event
 odoAndAsserv(const rmp440_io *rmp,
              const rmp440_kinematics_str *kinematics,
              const rmp440_var_params *var_params,
+             const rmp440_log_str *log,
              const rmp440_Joystick *Joystick, GYRO_DATA **gyroId,
              FE_STR **fe, or_genpos_cart_state *robot,
              or_genpos_cart_ref *ref, rmp440_max_accel *max_accel,
              or_genpos_track_mode *track_mode,
              rmp440_feedback **rs_data, rmp440_mode *rs_mode,
              rmp440_gyro *gyro, rmp440_gyro_asserv *gyro_asserv,
-             const rmp440_Odo *Odo, const rmp440_Pose *Pose,
-             const rmp440_Status *Status,
+             rmp440_cmd_str *cmd, const rmp440_Odo *Odo,
+             const rmp440_Pose *Pose, const rmp440_Status *Status,
              const rmp440_StatusGeneric *StatusGeneric,
              genom_context self)
 {
@@ -169,7 +171,6 @@ odoAndAsserv(const rmp440_io *rmp,
 	rmp_status_str *statusgen = StatusGeneric->data(self);
 	or_pose_estimator_state *pose = Pose->data(self);
 	double vRef, wRef;
-	double vCommand, wCommand;
 	genom_event report = genom_ok;
 	or_genpos_cart_config_var *var = &Odo->data(self)->var;
 
@@ -286,7 +287,6 @@ odoAndAsserv(const rmp440_io *rmp,
 	/*
 	 * Asserv
 	 */
-
 	switch (*rs_mode) {
 	case rmp440_mode_motors_off:
 		/* No motion possible */
@@ -331,8 +331,8 @@ odoAndAsserv(const rmp440_io *rmp,
 		return report;
 	}
 
-	// SDI_F->vReference = vRef;
-	// SDI_F->wReference = wRef;
+	cmd->vReference = vRef;
+	cmd->wReference = wRef;
 
 	double t = data->timestamp.tv_sec + data->timestamp.tv_nsec*1e-9;
 	if (*rs_mode == rmp440_mode_track)
@@ -342,7 +342,12 @@ odoAndAsserv(const rmp440_io *rmp,
 		control_yaw(gyro_asserv, t, vRef, wRef,
 		    gyro->gyroOmega, gyro->gyroTheta, &wRef);
 
-	rmp440VelocitySet(rmp, data, vRef, wRef, &vCommand, &wCommand);
+	rmp440VelocitySet(rmp, data, vRef, wRef,
+	    &cmd->vCommand, &cmd->wCommand);
+
+	/* log */
+	if (log != NULL)
+		rmp440LogFeedback(log, gyro, gyro_asserv, cmd, data);
 
 	/* publish */
 	memcpy(&Odo->data(self)->robot, robot, sizeof(or_genpos_cart_state));
