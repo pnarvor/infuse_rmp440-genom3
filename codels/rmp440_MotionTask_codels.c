@@ -46,6 +46,75 @@
 
 /* --- Task MotionTask -------------------------------------------------- */
 
+static void
+gyroUpdate(GYRO_DATA **gyroId, rmp440_gyro *gyro,
+    rmp440_gyro_asserv *gyro_asserv, or_genpos_cart_state *robot)
+{
+	uint32_t date;
+#if DEBUG>1
+	static int count = 0;
+#endif
+	/* Gyro */
+	if (gyroId != NULL /* && gyro->currentMode != RMP440_GYRO_OFF */) {
+		if (gyroRead(*gyroId, &(gyro->gyroTheta),
+			    &(gyro->gyroOmega), &date) != 0) {
+			gyro->currentMode = rmp440_gyro_off;
+			gyroEnd(*gyroId);
+			*gyroId = NULL;
+		}
+		else {
+		  gyro->gyroTheta = - gyro->gyroTheta;
+		  gyro->gyroOmega = - gyro->gyroOmega;
+		}
+	}
+	if (gyro->currentMode == rmp440_gyro_off ||
+	    (gyro->currentMode == rmp440_gyro_on_if_motion
+		&& fabs(robot->w) < 0.017
+		&& fabs(robot->v) < 0.01)) {
+		/* -- odo is reference */
+
+		/* reset gyro offset to match odo */
+		gyro->gyroToRobotOffset = angleLimit(robot->theta
+		    - gyro->gyroTheta);
+		/* switch back to odo */
+		if (gyro->gyroOn) {
+#if DEBUG>=1
+			printf ("-> odo (%5.2f d) v %5.2f w%5.3f\n",
+			    RAD_TO_DEG(robot->theta), robot->v, robot->w);
+#endif
+			gyro->gyroOn = false;
+		}
+	} else {
+		/* -- gyro is reference */
+		robot->theta = angleLimit(gyro->gyroTheta +
+		    gyro->gyroToRobotOffset);
+		/* switch back to gyro */
+		if (!gyro->gyroOn) {
+#if DEBUG>=1
+			printf ("-> gyro (%5.2f d) v %5.2f w%5.3f\n",
+			    RAD_TO_DEG(robot->theta), robot->v, robot->w);
+#endif
+			gyro->gyroOn = true;
+			gyro_asserv->first = 1;
+		}
+	}
+
+	/*debug */
+#if DEBUG>1
+	if (count==10) {
+		printf ("MODE %s. gyro %5.3f + offset %5.3f = %5.3f =? %5.3f\n",
+		    gyro->gyroOn ? "GYRO" : "ODO",
+		    RAD_TO_DEG(gyro->gyroTheta),
+		    RAD_TO_DEG(gyro->gyroToRobotOffset),
+		    RAD_TO_DEG(angleLimit(gyro->gyroTheta +
+			    gyro->gyroToRobotOffset)),
+		    RAD_TO_DEG(robot->theta));
+		count=0;
+	}
+	count++;
+#endif
+}
+
 /*----------------------------------------------------------------------*/
 
 /** Codel initOdoAndAsserv of task MotionTask.
@@ -166,7 +235,6 @@ odoAndAsserv(const rmp440_io *rmp,
 {
 	rmp440_feedback *data = *rs_data;
 	double direction;
-	uint32_t date;
 	rmp440_status_str *status = Status->data(self);
 	rmp_status_str *statusgen = StatusGeneric->data(self);
 	or_pose_estimator_state *pose = Pose->data(self);
@@ -174,9 +242,6 @@ odoAndAsserv(const rmp440_io *rmp,
 	genom_event report = genom_ok;
 	or_genpos_cart_config_var *var = &Odo->data(self)->var;
 
-#if DEBUG>=1
-	static int count = 0;
-#endif
 	if (rmp == NULL)
 		return rmp440_pause_odo; /* not initialized yet */
 
@@ -204,66 +269,7 @@ odoAndAsserv(const rmp440_io *rmp,
 	odoProba(robot, var,
 	    kinematics->axisWidth, var_params->coeffLinAng,
 	    rmp440_sec_period);	/* XXX could use the actual measured period */
-
-	/* Gyro */
-	if (gyroId != NULL /* && gyro->currentMode != RMP440_GYRO_OFF */) {
-		if (gyroRead(*gyroId, &(gyro->gyroTheta),
-			    &(gyro->gyroOmega), &date) != 0) {
-			gyro->currentMode = rmp440_gyro_off;
-			gyroEnd(*gyroId);
-			*gyroId = NULL;
-		}
-		else {
-		  gyro->gyroTheta = - gyro->gyroTheta;
-		  gyro->gyroOmega = - gyro->gyroOmega;
-		}
-	}
-	if (gyro->currentMode == rmp440_gyro_off ||
-	    (gyro->currentMode == rmp440_gyro_on_if_motion
-		&& fabs(robot->w) < 0.017
-		&& fabs(robot->v) < 0.01)) {
-		/* -- odo is reference */
-
-		/* reset gyro offset to match odo */
-		gyro->gyroToRobotOffset = angleLimit(robot->theta
-		    - gyro->gyroTheta);
-		/* switch back to odo */
-		if (gyro->gyroOn) {
-#if DEBUG>=1
-			printf ("-> odo (%5.2f d) v %5.2f w%5.3f\n",
-			    RAD_TO_DEG(robot->theta), robot->v, robot->w);
-#endif
-			gyro->gyroOn = false;
-		}
-	} else {
-		/* -- gyro is reference */
-		robot->theta = angleLimit(gyro->gyroTheta +
-		    gyro->gyroToRobotOffset);
-		/* switch back to gyro */
-		if (!gyro->gyroOn) {
-#if DEBUG>=1
-			printf ("-> gyro (%5.2f d) v %5.2f w%5.3f\n",
-			    RAD_TO_DEG(robot->theta), robot->v, robot->w);
-#endif
-			gyro->gyroOn = true;
-			gyro_asserv->first = 1;
-		}
-	}
-
-	/*debug */
-#if DEBUG>=1
-	if (count==10) {
-		printf ("MODE %s. gyro %5.3f + offset %5.3f = %5.3f =? %5.3f\n",
-		    gyro->gyroOn ? "GYRO" : "ODO",
-		    RAD_TO_DEG(gyro->gyroTheta),
-		    RAD_TO_DEG(gyro->gyroToRobotOffset),
-		    RAD_TO_DEG(angleLimit(gyro->gyroTheta +
-			    gyro->gyroToRobotOffset)),
-		    RAD_TO_DEG(robot->theta));
-		count=0;
-	}
-	count++;
-#endif
+	gyroUpdate(gyroId, gyro, gyro_asserv, robot);
 #ifdef notyet
 	if (odometryMode == RMP440_ODO_3D)
 		rmp440Odo3d(EXEC_TASK_PERIOD(RMP440_MOTIONTASK_NUM));
