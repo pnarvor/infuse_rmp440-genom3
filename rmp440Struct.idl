@@ -70,85 +70,85 @@ module rmp440 {
     or::time::ts timestamp;
     unsigned long fault_status[4];
     unsigned long mcu_fault_status[4];
-	float frame_count;
-	unsigned long operational_state;
-	unsigned long dynamic_response;
-	float min_propulsion_batt_soc; /* min. of all batt. state of charge */
-	float aux_batt_soc;	       /* aux batt. state of charge */
-	float inertial_x_acc;
-	float inertial_y_acc;
-	float inertial_x_rate;
-	float inertial_y_rate;
-	float inertial_z_rate;
-	float pse_pitch;
-	float pse_pitch_rate;
-	float pse_roll;
-	float pse_roll_rate;
-	float pse_yaw_rate;
-	unsigned long pse_data_is_valid;
-	float yaw_rate_limit;
-	float vel_limit;
-	float linear_accel;
-	float linear_vel;
-	float differential_wheel_vel;
-	float right_front_vel;
-	float left_front_vel;
-	float right_rear_vel;
-	float left_rear_vel;
-	float right_front_pos;
-	float left_front_pos;
-	float right_rear_pos;
-	float left_rear_pos;
-	float linear_pos;
-	float right_front_current;
-	float left_front_current;
-	float right_rear_current;
-	float left_rear_current;
-	float max_motor_current;
-	float right_front_current_limit;
-	float left_front_current_limit;
-	float right_rear_current_limit;
-	float left_rear_current_limit;
-	float min_motor_current_limit;
-	float front_base_batt_1_soc;
-	float front_base_batt_2_soc;
-	float rear_base_batt_1_soc;
-	float rear_base_batt_2_soc;
-	float front_base_batt_1_temp;
-	float front_base_batt_2_temp;
-	float rear_base_batt_1_temp;
-	float rear_base_batt_2_temp;
-	float vel_target;
-	float yaw_rate_target;
-	float angle_target;	/* only used on omni platforms */
-	float aux_batt_voltage;
-	float aux_batt_current;
-	float aux_batt_temp;
-	unsigned long abb_system_status;
-	unsigned long abb_batt_status;
-	unsigned long aux_batt_faults;
-	float ccu_7p2_battery_voltage;
-	unsigned long sp_sw_build_id;
-	unsigned long uip_sw_build_id;
-	float mcu_inst_power[4];
-	float mcu_total_energy[4];
-	float fram_vel_limit;
-	float fram_accel_limit;
-	float fram_decel_limit;
-	float fram_dtz_decel_limit;
-	float fram_coastdown_decel;
-	float fram_yaw_rate_limit;
-	float fram_yaw_accel_limit;
-	float fram_tire_diameter;
-	float fram_wheel_base_length;
-	float fram_wheel_track_width;
-	float fram_transmission_ratio;
-	unsigned long fram_config_bitmap;
-	unsigned long fram_eth_ip_address;
-	unsigned short fram_eth_port_number;
-	unsigned long fram_eth_subnet_mask;
-	unsigned long fram_eth_gateway;
-	unsigned long user_feedback_bitmap[4];
+    float frame_count;
+    unsigned long operational_state;
+    unsigned long dynamic_response;
+    float min_propulsion_batt_soc; /* min. of all batt. state of charge */
+    float aux_batt_soc;	       /* aux batt. state of charge */
+    float inertial_x_acc;
+    float inertial_y_acc;
+    float inertial_x_rate;
+    float inertial_y_rate;
+    float inertial_z_rate;
+    float pse_pitch;
+    float pse_pitch_rate;
+    float pse_roll;
+    float pse_roll_rate;
+    float pse_yaw_rate;
+    unsigned long pse_data_is_valid;
+    float yaw_rate_limit;
+    float vel_limit;
+    float linear_accel;
+    float linear_vel;
+    float differential_wheel_vel;
+    float right_front_vel;
+    float left_front_vel;
+    float right_rear_vel;
+    float left_rear_vel;
+    float right_front_pos;
+    float left_front_pos;
+    float right_rear_pos;
+    float left_rear_pos;
+    float linear_pos;
+    float right_front_current;
+    float left_front_current;
+    float right_rear_current;
+    float left_rear_current;
+    float max_motor_current;
+    float right_front_current_limit;
+    float left_front_current_limit;
+    float right_rear_current_limit;
+    float left_rear_current_limit;
+    float min_motor_current_limit;
+    float front_base_batt_1_soc;
+    float front_base_batt_2_soc;
+    float rear_base_batt_1_soc;
+    float rear_base_batt_2_soc;
+    float front_base_batt_1_temp;
+    float front_base_batt_2_temp;
+    float rear_base_batt_1_temp;
+    float rear_base_batt_2_temp;
+    float vel_target;
+    float yaw_rate_target;
+    float angle_target;	/* only used on omni platforms */
+    float aux_batt_voltage;
+    float aux_batt_current;
+    float aux_batt_temp;
+    unsigned long abb_system_status;
+    unsigned long abb_batt_status;
+    unsigned long aux_batt_faults;
+    float ccu_7p2_battery_voltage;
+    unsigned long sp_sw_build_id;
+    unsigned long uip_sw_build_id;
+    float mcu_inst_power[4];
+    float mcu_total_energy[4];
+    float fram_vel_limit;
+    float fram_accel_limit;
+    float fram_decel_limit;
+    float fram_dtz_decel_limit;
+    float fram_coastdown_decel;
+    float fram_yaw_rate_limit;
+    float fram_yaw_accel_limit;
+    float fram_tire_diameter;
+    float fram_wheel_base_length;
+    float fram_wheel_track_width;
+    float fram_transmission_ratio;
+    unsigned long fram_config_bitmap;
+    unsigned long fram_eth_ip_address;
+    unsigned short fram_eth_port_number;
+    unsigned long fram_eth_subnet_mask;
+    unsigned long fram_eth_gateway;
+    unsigned long user_feedback_bitmap[4];
   };
 
   struct status_str {
@@ -206,7 +206,6 @@ module rmp440 {
 
   struct gyro_asserv {
     boolean enabled; // is asserv enabled
-
     boolean first; // first call to this function ?
     boolean straight; // is in straight mode ?
     double straight_angle; // angle for straight mode
