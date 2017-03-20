@@ -195,7 +195,6 @@ module rmp440 {
   };
 
   struct gyro {
-    gyro_params params;
     boolean gyroOn;
     gyro_mode currentMode;
     double gyroToRobotOffset;

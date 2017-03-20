@@ -601,7 +601,6 @@ rmp440GyroExec(const rmp440_gyro_params *params,
 		*gyroId = gyroInit(params->type, params->port,
 			    params->latitude, params->woffset);
 		if (*gyroId == NULL) {
-			gyro->params.mode = rmp440_gyro_off;
 			gyro->currentMode = rmp440_gyro_off;
 			return rmp440_gyro_error(self);
 		}
@@ -609,7 +608,6 @@ rmp440GyroExec(const rmp440_gyro_params *params,
 
 	/* read gyro once */
 	if (gyroReadAngle(*gyroId, &gyro->gyroTheta) != 0) {
-		gyro->params.mode = rmp440_gyro_off;
 		gyro->currentMode = rmp440_gyro_off;
 		gyroEnd(*gyroId);
 		*gyroId = NULL;
