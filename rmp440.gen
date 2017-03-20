@@ -74,7 +74,6 @@ component rmp440 {
     or::genpos::track_mode track_mode;
     GYRO_DATA gyroId;
     gyro gyro;
-    gyro_mode gyro_mode;
     gyro_asserv gyro_asserv;
     max_accel max_accel;
     log_str log;
