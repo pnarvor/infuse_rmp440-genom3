@@ -21,6 +21,13 @@ typedef struct rmp440_log_str {
 	char *fileName;
 } rmp440_log_str;
 
+typedef  struct cmd_str {
+    double vReference, wReference; // commands received
+    double vCommand, wCommand;	   // commands sent after correction 
+} rmp440_cmd_str;
+
+
+
 #ifdef notyet			/* XXX update fields for new t3d */
 #define rmp440_Pose_header "date" \
 	"\tv\tw" \

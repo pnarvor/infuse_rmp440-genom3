@@ -50,11 +50,6 @@ component rmp440 {
     or::genpos::cart_config_var var;
   };
 
-  struct cmd_str {
-    double vReference, wReference; // commands received
-    double vCommand, wCommand;	   // commands sent after correction 
-  };
-
   port in or::genpos::cart_speed cmd_vel;
   port in or_joystick::state Joystick;
   port out odo_str Odo;
@@ -81,7 +76,6 @@ component rmp440 {
     gyro gyro;
     gyro_mode gyro_mode;
     gyro_asserv gyro_asserv;
-    cmd_str cmd;
     max_accel max_accel;
     log_str log;
   };
@@ -110,7 +104,6 @@ component rmp440 {
 			    out rs_mode,
 			    out gyro,
 			    out gyro_asserv,
-			    out cmd,
 			    out Odo,
 			    out Pose,
 			    out Status,

@@ -44,6 +44,7 @@
 #include "codels.h"
 #include "rmp440_Log.h"
 
+
 /* --- Task MotionTask -------------------------------------------------- */
 
 static void
@@ -228,8 +229,8 @@ odoAndAsserv(const rmp440_io *rmp,
              or_genpos_track_mode *track_mode,
              rmp440_feedback **rs_data, rmp440_mode *rs_mode,
              rmp440_gyro *gyro, rmp440_gyro_asserv *gyro_asserv,
-             rmp440_cmd_str *cmd, const rmp440_Odo *Odo,
-             const rmp440_Pose *Pose, const rmp440_Status *Status,
+             const rmp440_Odo *Odo, const rmp440_Pose *Pose,
+             const rmp440_Status *Status,
              const rmp440_StatusGeneric *StatusGeneric,
              genom_context self)
 {
@@ -241,6 +242,7 @@ odoAndAsserv(const rmp440_io *rmp,
 	double vRef, wRef;
 	genom_event report = genom_ok;
 	or_genpos_cart_config_var *var = &Odo->data(self)->var;
+	struct cmd_str cmd;
 
 	if (rmp == NULL)
 		return rmp440_pause_odo; /* not initialized yet */
@@ -337,8 +339,8 @@ odoAndAsserv(const rmp440_io *rmp,
 		return report;
 	}
 
-	cmd->vReference = vRef;
-	cmd->wReference = wRef;
+	cmd.vReference = vRef;
+	cmd.wReference = wRef;
 
 	double t = data->timestamp.tv_sec + data->timestamp.tv_nsec*1e-9;
 	if (*rs_mode == rmp440_mode_track)
@@ -349,11 +351,11 @@ odoAndAsserv(const rmp440_io *rmp,
 		    gyro->gyroOmega, gyro->gyroTheta, &wRef);
 
 	rmp440VelocitySet(rmp, data, vRef, wRef,
-	    &cmd->vCommand, &cmd->wCommand);
+	    &cmd.vCommand, &cmd.wCommand);
 
 	/* log */
 	if (log != NULL)
-		rmp440LogFeedback(log, gyro, gyro_asserv, cmd, data);
+		rmp440LogFeedback(log, gyro, gyro_asserv, &cmd, data);
 
 	/* publish */
 	memcpy(&Odo->data(self)->robot, robot, sizeof(or_genpos_cart_state));
