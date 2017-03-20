@@ -61,6 +61,7 @@ component rmp440 {
     mode rs_mode;
     rmp440_feedback rs_data;
     or::genpos::cart_state robot;
+    or::genpos::cart_config_var var;
     or::genpos::cart_ref ref;
     kinematics_str kinematics;
     dynamic_str dynamics;
@@ -90,6 +91,7 @@ component rmp440 {
 			    inout gyroId,
 			    inout fe,
 			    inout robot,
+			    inout var,
 			    inout ref,
 			    inout max_accel,
 			    inout track_mode,
@@ -182,10 +184,6 @@ component rmp440 {
     throw gyro_error;
     interrupts Gyro;
   };
-
-  /* SetParameters */
-
-  /* SetPos */
 
   /*----------------------------------------------------------------------*/
   /* Log */
