@@ -45,14 +45,8 @@ component rmp440 {
   exception cmd_stop_track;
   exception sys_error;
 
-  struct odo_str {
-    or::genpos::cart_state robot;
-    or::genpos::cart_config_var var;
-  };
-
   port in or::genpos::cart_speed cmd_vel;
   port in or_joystick::state Joystick;
-  port out odo_str Odo;
   port out or_pose_estimator::state Pose;
   port out status_str Status;
   port out rmp::status_str StatusGeneric;
@@ -103,7 +97,6 @@ component rmp440 {
 			    out rs_mode,
 			    out gyro,
 			    out gyro_asserv,
-			    out Odo,
 			    out Pose,
 			    out Status,
 			    out StatusGeneric) yield ether, pause::odo, end;

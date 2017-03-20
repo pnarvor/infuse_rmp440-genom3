@@ -238,8 +238,7 @@ odoAndAsserv(const rmp440_io *rmp,
              or_genpos_track_mode *track_mode,
              rmp440_feedback **rs_data, rmp440_mode *rs_mode,
              rmp440_gyro *gyro, rmp440_gyro_asserv *gyro_asserv,
-             const rmp440_Odo *Odo, const rmp440_Pose *Pose,
-             const rmp440_Status *Status,
+             const rmp440_Pose *Pose, const rmp440_Status *Status,
              const rmp440_StatusGeneric *StatusGeneric,
              genom_context self)
 {
@@ -250,7 +249,7 @@ odoAndAsserv(const rmp440_io *rmp,
 	or_pose_estimator_state *pose = Pose->data(self);
 	double vRef, wRef;
 	genom_event report = genom_ok;
-	or_genpos_cart_config_var *var = &Odo->data(self)->var;
+	or_genpos_cart_config_var var;
 	struct cmd_str cmd;
 
 	if (rmp == NULL)
@@ -277,7 +276,7 @@ odoAndAsserv(const rmp440_io *rmp,
 	robot->xRef = robot->xRob;
 	robot->yRef = robot->yRob;
 
-	odoProba(robot, var,
+	odoProba(robot, &var,
 	    kinematics->axisWidth, var_params->coeffLinAng,
 	    rmp440_sec_period);	/* XXX could use the actual measured period */
 	gyroUpdate(gyroId, gyro, gyro_asserv, robot);
@@ -368,9 +367,7 @@ odoAndAsserv(const rmp440_io *rmp,
 		rmp440LogFeedback(log, gyro, gyro_asserv, &cmd, data);
 
 	/* publish */
-	memcpy(&Odo->data(self)->robot, robot, sizeof(or_genpos_cart_state));
 	Pose->write(self);
-	Odo->write(self);
 	Status->write(self);
 	StatusGeneric->write(self);
 
