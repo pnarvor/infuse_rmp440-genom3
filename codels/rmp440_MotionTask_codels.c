@@ -116,6 +116,15 @@ gyroUpdate(GYRO_DATA **gyroId, rmp440_gyro *gyro,
 #endif
 }
 
+static void
+yawToQuaternion(double yaw, or_t3d_pos *pos)
+{
+	pos->qw = cos(yaw * 0.5);
+	pos->qx = 0.0;
+	pos->qy = 0.0;
+	pos->qz = sin(yaw * 0.5);
+}
+
 /*----------------------------------------------------------------------*/
 
 /** Codel initOdoAndAsserv of task MotionTask.
@@ -283,7 +292,8 @@ odoAndAsserv(const rmp440_io *rmp,
 	pose->pos._present = true;
 	pose->pos._value.x = robot->xRob;
 	pose->pos._value.y = robot->yRob;
-	pose->pos._value.z = 0.0; 	/* XXXX */
+	pose->pos._value.z = 0.0; 	/* XXX */
+	yawToQuaternion(robot->theta, &pose->pos._value); /* XXX */
 	pose->vel._present = true;
 	pose->vel._value.vx = robot->v;
 	pose->vel._value.vy = 0;
