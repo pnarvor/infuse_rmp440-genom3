@@ -122,7 +122,7 @@ initOdoAndAsserv(rmp440_ids *ids,
 #endif
 
 	/* gyro */
-	gyro->params.mode = rmp440_gyro_on;
+	gyro->currentMode = rmp440_gyro_off;
 	gyro->gyroOn = false;
 	gyro->gyroToRobotOffset = 0.0;
 	gyro->gyroTheta = 0.0;
