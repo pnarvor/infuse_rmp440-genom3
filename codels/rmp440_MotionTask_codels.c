@@ -619,7 +619,7 @@ rmp440GyroExec(const rmp440_gyro_params *params,
 	/* reset gyro offset to match odo */
 	gyro->gyroToRobotOffset = robot->theta - gyro->gyroTheta;
 
-	gyro->currentMode = gyro->params.mode;
-
+	/* Finally set gyro mode */
+	gyro->currentMode = params->mode;
 	return rmp440_ether;
 }
