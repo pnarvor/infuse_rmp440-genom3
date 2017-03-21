@@ -217,7 +217,6 @@ odoAndAsserv(const rmp440_io *rmp,
 	rmp440_status_str *status = Status->data(self);
 	rmp_status_str *statusgen = StatusGeneric->data(self);
 	or_pose_estimator_state *pose = Pose->data(self);
-	double vRef, wRef;
 	genom_event report = genom_ok;
 	struct cmd_str cmd;
 
@@ -273,20 +272,20 @@ odoAndAsserv(const rmp440_io *rmp,
 
 	case rmp440_mode_emergency:
 	case rmp440_mode_idle:
-		vRef = 0.0;
-		wRef = 0.0;
+		ref->v = 0.0;
+		ref->w = 0.0;
 		break;
 
 	case rmp440_mode_manual:
 		Joystick->read(self);
-		getJoystickSpeeds(Joystick->data(self), data, &vRef, &wRef,
-		    &ref->linAccelMax, &ref->angAccelMax);
-		ref->v = vRef;
-		ref->w = wRef;
+		getJoystickSpeeds(Joystick->data(self), data,
+		    &ref->v, &ref->w, &ref->linAccelMax, &ref->angAccelMax);
 		break;
 
 	case rmp440_mode_track:
-		report = track(ref, *track_mode, &vRef, &wRef, self);
+		/* ref has beed updated by the trackTask */
+		if (*track_mode != or_genpos_track_speed)
+			report = rmp440_bad_track_mode(self);
 		break;
 
 	default:
@@ -298,23 +297,26 @@ odoAndAsserv(const rmp440_io *rmp,
 		*rs_mode = statusgen->rs_mode = rmp440_mode_idle;
 		*track_mode = or_genpos_no_tracking;
 
-		vRef = 0;
-		wRef = 0;
+		ref->v = 0;
+		ref->w = 0;
 		return report;
 	}
 
-	cmd.vReference = vRef;
-	cmd.wReference = wRef;
+	/* keep theoretical values */
+	cmd.vReference = ref->v;
+	cmd.wReference = ref->w;
 
+	/* Adjustements depending on the robot */
 	double t = data->timestamp.tv_sec + data->timestamp.tv_nsec*1e-9;
 	if (*rs_mode == rmp440_mode_track)
-		bound_accels(max_accel, t, &vRef, &wRef);
+		bound_accels(max_accel, t, &ref->v, &ref->w);
 
 	if (gyro->gyroOn)
-		control_yaw(gyro_asserv, t, vRef, wRef,
-		    gyro->gyroOmega, gyro->gyroTheta, &wRef);
+		control_yaw(gyro_asserv, t, ref->v, ref->w,
+		    gyro->gyroOmega, gyro->gyroTheta, &ref->w);
 
-	rmp440VelocitySet(rmp, data, vRef, wRef,
+	/* Send  commands to the wheels */
+	rmp440VelocitySet(rmp, data, ref->v, ref->w,
 	    &cmd.vCommand, &cmd.wCommand);
 
 	/* log */

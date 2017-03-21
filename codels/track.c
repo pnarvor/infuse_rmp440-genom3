@@ -30,26 +30,6 @@
 #include "orMathLib.h"
 #include "codels.h"
 
-/*----------------------------------------------------------------------*/
-
-/**
- ** Actual tracking code
- **/
-genom_event
-track(const or_genpos_cart_speed *ref, or_genpos_track_mode track_mode,
-    double *vRef, double *wRef, genom_context self)
-{
-
-	switch (track_mode) {
-	case or_genpos_track_speed:
-		*vRef = ref->v;
-		*wRef = ref->w;
-		break;
-	default:
-		return rmp440_bad_track_mode(self);
-	}
-	return genom_ok;
-}
 
 /*----------------------------------------------------------------------*/
 
