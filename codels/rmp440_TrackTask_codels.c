@@ -99,12 +99,6 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
 	}
 
 	switch (track_mode) {
-#ifdef notyet
-	case or_genpos_track_pos:
-		return pumpConfigReference(robot, cmd_vel, ref, self);
-	case or_genpos_track_config:
-		return pumpConfigReference(robot, cmd_vel, ref, self);
-#endif
 	case or_genpos_track_speed:
 		return pumpSpeedReference(robot, cmd_vel, ref, self);
 	default:
@@ -127,13 +121,6 @@ smoothStopTrack(const or_genpos_cart_state *robot,
                 rmp440_mode *rs_mode, or_genpos_track_mode *track_mode,
                 or_genpos_cart_ref *ref, genom_context self)
 {
-	double dtArret;                /* Temps d'arret */
-	double dtRetard;               /* Temps de prise en compte de la consigne */
-	double dsArret;                /* Longueur d'arret */
-	double dtLoco;                 /* Periode d'asserv de la loco */
-	double angle;                  /* Moyenne entre angles d'init et d'arret */
-	double theta;
-
 	printf("rmp440 smoothStopTrack\n");
 
 	if (*track_mode == or_genpos_track_speed) {
@@ -147,39 +134,7 @@ smoothStopTrack(const or_genpos_cart_state *robot,
 		ref->v = 0.0;
 		ref->w = 0.0;
 	} else {
-#ifdef notyet
-		ref->dataType = or_genpos_pos_and_speed_data;
-
-		/* Determination de la periode d'asserv de la loco */
-		dtLoco = rmp440_sec_period;
-
-		/* Temps d'arret minimal (tps de decel) */
-		dtArret = MAX (fabs(robot->v) / dynamics->linAccelMax,
-			fabs(robot->w) / dynamics->angAccelMax);
-
-		/* Temps de prise en compte (v = cst) */
-		dtRetard =  1 * dtLoco;
-
-		/* Angle final (avec periode de prise en compte) */
-		theta = robot->theta + robot->w * (dtArret / 2 + dtRetard);
-
-		/* Angle moyen */
-		angle = (robot->theta + theta) / 2;
-
-		/* Longueur d'arret */
-		dsArret = robot->v * (dtArret / 2 + dtRetard);
-
-		/* Prevision position du centre */
-		ref->x = robot->xRob + dsArret * cos (angle);
-		ref->y = robot->yRob + dsArret * sin (angle);
-
-		/* Vitesses de consigne nulles */
-		ref->v = 0. ;
-		ref->w = 0. ;
-
-		/* Indiquer l'arret du tracking */
 		return rmp440_bad_track_mode(self);
-#endif
 	}
 	*track_mode = or_genpos_no_tracking;
 	*rs_mode = rmp440_mode_idle;

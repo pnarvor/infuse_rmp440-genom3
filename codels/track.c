@@ -40,34 +40,8 @@ track(const or_genpos_cart_ref *ref, const or_genpos_cart_state *robot,
     or_genpos_track_mode track_mode,
     double *vRef, double *wRef, genom_context self)
 {
-#ifdef notyet
-	static double prevV, prevW;
-	static bool prevDrifted = false;
-	bool drifted = false;
-#endif
 
 	switch (track_mode) {
-#ifdef notyet
-	case or_genpos_track_pos:
-		if (ref->dataType != or_genpos_pos_data) {
-			fprintf(stderr, "wrong data type for TRACK_POS\n");
-			return rmp440_bad_ref(self);
-		}
-		drifted = contLawCartPositionControl(&rmp440DataStrId->cmd,
-		    ref, robot, EXEC_TASK_PERIOD(RMP440_MOTIONTASK_NUM),
-		    prevV, prevW, vRef, wRef);
-		break;
-
-	case or_genpos_track_config:
-		if (ref->dataType != or_genpos_pos_and_speed_data) {
-			fprintf(stderr, "wrong data type for TRACK_CONFIG\n");
-			return rmp440_bad_ref(self);
-		}
-		drifted = contLawCartConfigControl(&rmp440DataStrId->cmd,
-		    ref, robot, EXEC_TASK_PERIOD(RMP440_MOTIONTASK_NUM),
-		    prevV, prevW, vRef, wRef);
-		break;
-#endif
 	case or_genpos_track_speed:
 		if (ref->dataType != or_genpos_speed_data) {
 			fprintf(stderr, "wrong data type for TRACK_SPEED %d\n",
@@ -81,20 +55,6 @@ track(const or_genpos_cart_ref *ref, const or_genpos_cart_state *robot,
 	default:
 		return rmp440_bad_track_mode(self);
 	}
-#ifdef notyet
-	if (drifted && !prevDrifted) {
-		printf("odoAndAsserv: important drift!\n");
-		printf("ref: %.2lf %.2lf %.2lf\n",
-		       ref->x, ref->y, ref->theta);
-		printf("pos: %.2lf %.2lf %.2lf\n",
-		       robot->xRef, robot->yRef, robot->theta);
-	}
-	if (!drifted && prevDrifted)
-		printf("odoAndAsserv: drift cancelled\n");
-	prevDrifted = drifted;
-	prevV = *vRef;
-	prevW = *wRef;
-#endif
 	return genom_ok;
 }
 

@@ -176,31 +176,6 @@ initOdoAndAsserv(rmp440_ids *ids,
 	ref->linAccelMax = RMP_DEFAULT_MAXIMUM_ACCEL;
 	ref->angAccelMax = RMP_DEFAULT_MAXIMUM_YAW_ACCEL;
 
-#ifdef notyet
-	/* Control parameters */
-	cmdId = &rmp440DataStrId->cmd;
-	cmdId->distPoint = RMP440_DIST_TO_CONTROLLED_POINT;
-	cmdId->KpLongit = RMP440_KP_LONGIT;
-	cmdId->KiLongit = RMP440_KI_LONGIT;
-	cmdId->KpTransv = RMP440_KP_TRANSV;
-	cmdId->KiTransv = RMP440_KI_TRANSV;
-
-	cmdId->KpAng = RMP440_KP_ANG;
-	cmdId->KiAng = RMP440_KI_ANG;
-
-	cmdId->longitMaxGap = RMP440_LONGIT_MAX_GAP;
-	cmdId->transvMaxGap = RMP440_TRANSV_MAX_GAP;
-	cmdId->angMaxGap    = RMP440_ANG_MAX_GAP;
-
-	cmdId->longitErrorMax = RMP440_LONGIT_ERROR_MAX;
-	cmdId->transvErrorMax = RMP440_TRANSV_ERROR_MAX;
-	cmdId->angErrorMax = RMP440_ANG_ERROR_MAX;
-
-	cmdId->longitMaxErrSum = RMP440_LONGIT_MAX_ERR_SUM;
-	cmdId->transvMaxErrSum = RMP440_TRANSV_MAX_ERR_SUM;
-	cmdId->angMaxErrSum = RMP440_ANG_MAX_ERR_SUM;
-#endif
-
 	/* gyro */
 	gyro->currentMode = rmp440_gyro_off;
 	gyro->gyroOn = false;
