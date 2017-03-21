@@ -62,8 +62,8 @@ pumpSpeedReference(const or_genpos_cart_state *robot,
  *
  * Triggered by rmp440_start.
  * Yields to rmp440_track_main, rmp440_end.
- * Throws rmp440_poster_not_found, rmp440_bad_ref,
- *        rmp440_cmd_stop_track, rmp440_motors_off,
+ * Throws rmp440_poster_not_found, rmp440_bad_track_mode,
+ *        rmp440_bad_ref, rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
  */
 genom_event
@@ -79,8 +79,8 @@ trackStart(const rmp440_cmd_vel *cmd_vel, or_genpos_track_mode mode,
  *
  * Triggered by rmp440_track_main.
  * Yields to rmp440_pause_track_main, rmp440_end.
- * Throws rmp440_poster_not_found, rmp440_bad_ref,
- *        rmp440_cmd_stop_track, rmp440_motors_off,
+ * Throws rmp440_poster_not_found, rmp440_bad_track_mode,
+ *        rmp440_bad_ref, rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
  */
 genom_event
@@ -108,7 +108,7 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
 	case or_genpos_track_speed:
 		return pumpSpeedReference(robot, cmd_vel, ref, self);
 	default:
-		return  rmp440_pause_track_main;
+		return  rmp440_bad_track_mode(self);
 
 	}
 }
@@ -117,8 +117,8 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
  *
  * Triggered by rmp440_end.
  * Yields to rmp440_ether.
- * Throws rmp440_poster_not_found, rmp440_bad_ref,
- *        rmp440_cmd_stop_track, rmp440_motors_off,
+ * Throws rmp440_poster_not_found, rmp440_bad_track_mode,
+ *        rmp440_bad_ref, rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
  */
 genom_event
@@ -138,6 +138,7 @@ smoothStopTrack(const or_genpos_cart_state *robot,
 
 	if (*track_mode == or_genpos_track_speed) {
 		/* Set a null speed and stop the tracking */
+		/* XXX should compute a decceleration ramp */
 		track_mode = or_genpos_no_tracking;
 		ref->dataType = or_genpos_speed_data;
 		ref->x = robot->xRob;
@@ -146,6 +147,7 @@ smoothStopTrack(const or_genpos_cart_state *robot,
 		ref->v = 0.0;
 		ref->w = 0.0;
 	} else {
+#ifdef notyet
 		ref->dataType = or_genpos_pos_and_speed_data;
 
 		/* Determination de la periode d'asserv de la loco */
@@ -176,6 +178,8 @@ smoothStopTrack(const or_genpos_cart_state *robot,
 		ref->w = 0. ;
 
 		/* Indiquer l'arret du tracking */
+		return rmp440_bad_track_mode(self);
+#endif
 	}
 	*track_mode = or_genpos_no_tracking;
 	*rs_mode = rmp440_mode_idle;

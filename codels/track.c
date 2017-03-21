@@ -79,7 +79,7 @@ track(const or_genpos_cart_ref *ref, const or_genpos_cart_state *robot,
 		*wRef = ref->w;
 		break;
 	default:
-		return rmp440_bad_ref(self);
+		return rmp440_bad_track_mode(self);
 	}
 #ifdef notyet
 	if (drifted && !prevDrifted) {

@@ -35,6 +35,7 @@ component rmp440 {
   exception already_initialized;
   exception malloc_error;
   exception bad_ref;
+  exception bad_track_mode;
   exception rmplib_error;
   exception joystick_error;
   exception gyro_error;
@@ -162,8 +163,8 @@ component rmp440 {
 			       inout track_mode,
 			       out ref) yield ether;
     task TrackTask;
-    throw poster_not_found, bad_ref, cmd_stop_track, motors_off,
-      emergency_stop, power_cord_connected;
+    throw poster_not_found, bad_track_mode, bad_ref, cmd_stop_track, 
+      motors_off, emergency_stop, power_cord_connected;
     interrupts JoystickOn, Track;
   };
 
