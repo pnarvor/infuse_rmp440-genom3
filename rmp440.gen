@@ -42,7 +42,7 @@ component rmp440 {
   exception motors_off;
   exception emergency_stop;
   exception power_cord_connected;
-  exception poster_not_found;
+  exception port_not_found;
   exception cmd_stop_track;
   exception sys_error;
 
@@ -150,7 +150,7 @@ component rmp440 {
 
   activity Track(in or::genpos::track_mode mode = 
 		 or::genpos::track_speed: "Tracking mode") {
-    doc  "Start tracking a reference poster";
+    doc  "Start tracking a reference port";
     codel <start>trackStart(port in cmd_vel, in mode) yield track_main, end;
     codel <track_main>pumpReference(in robot,
 			      in rs_mode,
@@ -163,7 +163,7 @@ component rmp440 {
 			       inout track_mode,
 			       out ref) yield ether;
     task TrackTask;
-    throw poster_not_found, bad_track_mode, bad_ref, cmd_stop_track, 
+    throw port_not_found, bad_track_mode, bad_ref, cmd_stop_track, 
       motors_off, emergency_stop, power_cord_connected;
     interrupts JoystickOn, Track;
   };
