@@ -68,6 +68,7 @@ module or {
       double angAccelMax;
     };
 
+    /* Possible tracking modes */
     enum track_mode {
       no_tracking,
       track_pos,
