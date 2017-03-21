@@ -31,7 +31,7 @@
 
 static genom_event
 pumpSpeedReference(const or_genpos_cart_state *robot,
-    const rmp440_cmd_vel *cmd_vel, or_genpos_cart_ref *ref,
+    const rmp440_cmd_vel *cmd_vel, or_genpos_cart_speed *ref,
     genom_context self)
 {
 	or_genpos_cart_speed *orders;
@@ -40,18 +40,13 @@ pumpSpeedReference(const or_genpos_cart_state *robot,
 		return rmp440_port_not_found(self);
 	orders = cmd_vel->data(self);
 
-	/* Transmettre la consigne */
-	ref->backFlag = (orders->v > 0 ?
-	    or_genpos_forward_motion : or_genpos_backward_motion);
-	ref->v = fabs(orders->v);
-	/* printf("pumpSpeedRef: %lf\n", ref->v); */
+	ref->v = orders->v;
 	ref->vt = 0;
 	ref->w = orders->w;
 	ref->vmax = orders->vmax;
 	ref->wmax = orders->wmax;
 	ref->linAccelMax = orders->linAccelMax;
 	ref->angAccelMax = orders->angAccelMax;
-	ref->dataType = or_genpos_speed_data;
 	return rmp440_pause_track_main;
 }
 
@@ -86,7 +81,7 @@ trackStart(const rmp440_cmd_vel *cmd_vel, or_genpos_track_mode mode,
 genom_event
 pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
               or_genpos_track_mode track_mode,
-              const rmp440_cmd_vel *cmd_vel, or_genpos_cart_ref *ref,
+              const rmp440_cmd_vel *cmd_vel, or_genpos_cart_speed *ref,
               genom_context self)
 {
 
@@ -119,7 +114,7 @@ genom_event
 smoothStopTrack(const or_genpos_cart_state *robot,
                 const rmp440_dynamic_str *dynamics,
                 rmp440_mode *rs_mode, or_genpos_track_mode *track_mode,
-                or_genpos_cart_ref *ref, genom_context self)
+                or_genpos_cart_speed *ref, genom_context self)
 {
 	printf("rmp440 smoothStopTrack\n");
 
@@ -127,10 +122,6 @@ smoothStopTrack(const or_genpos_cart_state *robot,
 		/* Set a null speed and stop the tracking */
 		/* XXX should compute a decceleration ramp */
 		track_mode = or_genpos_no_tracking;
-		ref->dataType = or_genpos_speed_data;
-		ref->x = robot->xRob;
-		ref->y = robot->yRob;
-		ref->theta = robot->theta;
 		ref->v = 0.0;
 		ref->w = 0.0;
 	} else {

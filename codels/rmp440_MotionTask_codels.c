@@ -141,7 +141,7 @@ initOdoAndAsserv(rmp440_ids *ids,
 	rmp_status_str *statusgen = StatusGeneric->data(self);
 	rmp440_kinematics_str *kinematics = &ids->kinematics;
 	or_genpos_cart_state *robot = &ids->robot;
-	or_genpos_cart_ref *ref = &ids->ref;
+	or_genpos_cart_speed *ref = &ids->ref;
 	rmp440_gyro *gyro = &ids->gyro;
 	rmp440_gyro_asserv *gyro_asserv = &ids->gyro_asserv;
 	rmp440_max_accel *max_accel = &ids->max_accel;
@@ -163,14 +163,8 @@ initOdoAndAsserv(rmp440_ids *ids,
 	robot->w = 0;
 
 	/* Ref Data */
-	ref->dataType = or_genpos_pos_and_speed_data;
-	ref->backFlag = or_genpos_forward_motion;
-	ref->x = robot->xRef;
-	ref->y = robot->yRef;
-	ref->theta = robot->theta;
 	ref->v = 0.;
 	ref->w = 0.;
-
 	ref->vmax = RMP_DEFAULT_MAXIMUM_VELOCITY;
 	ref->wmax = RMP_DEFAULT_MAXIMUM_YAW_RATE;
 	ref->linAccelMax = RMP_DEFAULT_MAXIMUM_ACCEL;
@@ -209,7 +203,7 @@ odoAndAsserv(const rmp440_io *rmp,
              const rmp440_log_str *log,
              const rmp440_Joystick *Joystick, GYRO_DATA **gyroId,
              FE_STR **fe, or_genpos_cart_state *robot,
-             or_genpos_cart_config_var *var, or_genpos_cart_ref *ref,
+             or_genpos_cart_config_var *var, or_genpos_cart_speed *ref,
              rmp440_max_accel *max_accel,
              or_genpos_track_mode *track_mode,
              rmp440_feedback **rs_data, rmp440_mode *rs_mode,
@@ -241,13 +235,6 @@ odoAndAsserv(const rmp440_io *rmp,
 
 	/* Read config */
 	rmp440VelocityGet(data, robot);
-	if (ref->backFlag == or_genpos_forward_motion)
-		direction = 1;
-	else if (ref->backFlag == or_genpos_backward_motion)
-		direction = -1;
-	else
-		direction = 0;
-
 	robot->xRef = robot->xRob;
 	robot->yRef = robot->yRob;
 
@@ -288,17 +275,10 @@ odoAndAsserv(const rmp440_io *rmp,
 	case rmp440_mode_idle:
 		vRef = 0.0;
 		wRef = 0.0;
-		ref->x = robot->xRef;
-		ref->y = robot->yRef;
-		ref->theta = robot->theta;
 		break;
-
 
 	case rmp440_mode_manual:
 		Joystick->read(self);
-		ref->x = robot->xRef;
-		ref->y = robot->yRef;
-		ref->theta = robot->theta;
 		getJoystickSpeeds(Joystick->data(self), data, &vRef, &wRef,
 		    &ref->linAccelMax, &ref->angAccelMax);
 		ref->v = vRef;
@@ -306,7 +286,7 @@ odoAndAsserv(const rmp440_io *rmp,
 		break;
 
 	case rmp440_mode_track:
-		report = track(ref, robot, *track_mode, &vRef, &wRef, self);
+		report = track(ref, *track_mode, &vRef, &wRef, self);
 		break;
 
 	default:
@@ -567,7 +547,7 @@ rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
  *        rmp440_power_cord_connected.
  */
 genom_event
-rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_ref *ref,
+rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_speed *ref,
                       genom_context self)
 {
 	//ref->linAccelMax = rmp_default_maximum_accel;

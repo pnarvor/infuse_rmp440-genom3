@@ -37,8 +37,8 @@ extern void rmp440VelocitySet(const rmp440_io *rmp, const rmp440_feedback *data,
     double v, double w, double *vCommand, double *wCommand);
 
 /* track.c */
-extern genom_event track(const or_genpos_cart_ref *ref, 
-    const or_genpos_cart_state *robot, or_genpos_track_mode track_mode,
+extern genom_event track(const or_genpos_cart_speed *ref,
+    or_genpos_track_mode track_mode,
     double *vRef, double *wRef, genom_context self);
 extern void bound_accels(rmp440_max_accel *acc, double t,
     double *vel_reference, double *ang_reference);

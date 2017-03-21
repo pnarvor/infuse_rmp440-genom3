@@ -36,20 +36,13 @@
  ** Actual tracking code
  **/
 genom_event
-track(const or_genpos_cart_ref *ref, const or_genpos_cart_state *robot,
-    or_genpos_track_mode track_mode,
+track(const or_genpos_cart_speed *ref, or_genpos_track_mode track_mode,
     double *vRef, double *wRef, genom_context self)
 {
 
 	switch (track_mode) {
 	case or_genpos_track_speed:
-		if (ref->dataType != or_genpos_speed_data) {
-			fprintf(stderr, "wrong data type for TRACK_SPEED %d\n",
-			    ref->dataType);
-			return rmp440_bad_ref(self);
-		}
-		*vRef = (ref->backFlag == or_genpos_forward_motion ? ref->v :
-		    -ref->v);
+		*vRef = ref->v;
 		*wRef = ref->w;
 		break;
 	default:

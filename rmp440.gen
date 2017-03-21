@@ -63,7 +63,7 @@ component rmp440 {
     rmp440_feedback rs_data;
     or::genpos::cart_state robot;
     or::genpos::cart_config_var var;
-    or::genpos::cart_ref ref;
+    or::genpos::cart_speed ref;
     kinematics_str kinematics;
     dynamic_str dynamics;
     var_params var_params;
