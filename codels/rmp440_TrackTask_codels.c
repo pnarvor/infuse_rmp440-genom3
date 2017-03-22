@@ -39,7 +39,10 @@ pumpSpeedReference(const or_genpos_cart_state *robot,
 	if (cmd_vel->read(self) != genom_ok)
 		return rmp440_port_not_found(self);
 	orders = cmd_vel->data(self);
-
+	if (orders == NULL)  {
+		printf("%s: orders == NULL\n", __func__);
+		return rmp440_pause_track_main;
+	}
 	ref->v = orders->v;
 	ref->vt = 0;
 	ref->w = orders->w;
@@ -57,15 +60,20 @@ pumpSpeedReference(const or_genpos_cart_state *robot,
  *
  * Triggered by rmp440_start.
  * Yields to rmp440_track_main, rmp440_end.
- * Throws rmp440_port_not_found, rmp440_bad_ref,
+ * Throws rmp440_not_connected, rmp440_port_not_found, rmp440_bad_ref,
  *        rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
  */
 genom_event
-trackStart(const rmp440_cmd_vel *cmd_vel, genom_context self)
+trackStart(rmp440_mode *rs_mode, const rmp440_cmd_vel *cmd_vel,
+           genom_context self)
 {
+	printf("-- %s\n", __func__);
 	if (cmd_vel->read(self) != genom_ok)
 		return rmp440_port_not_found(self);
+	if (cmd_vel->data(self) == NULL)
+		return rmp440_port_not_found(self);
+	*rs_mode = rmp440_mode_track;
 	return rmp440_track_main;
 }
 
@@ -73,7 +81,7 @@ trackStart(const rmp440_cmd_vel *cmd_vel, genom_context self)
  *
  * Triggered by rmp440_track_main.
  * Yields to rmp440_pause_track_main, rmp440_end.
- * Throws rmp440_port_not_found, rmp440_bad_ref,
+ * Throws rmp440_not_connected, rmp440_port_not_found, rmp440_bad_ref,
  *        rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
  */
@@ -84,21 +92,26 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
 {
 
 	/* Check if mode changed */
-	switch (rs_mode) {
-	case rmp440_mode_emergency:
-		return rmp440_emergency_stop(self);
-	case rmp440_mode_motors_off:
-		return rmp440_motors_off(self);
-	}
-
-	return pumpSpeedReference(robot, cmd_vel, ref, self);
+	if (rs_mode != rmp440_mode_track) {
+		ref->v = 0;
+		ref->w = 0;
+		switch (rs_mode) {
+		case rmp440_mode_emergency:
+			return rmp440_emergency_stop(self);
+		case rmp440_mode_motors_off:
+			return rmp440_motors_off(self);
+		default:
+		return rmp440_bad_ref(self);
+		}
+	} else
+		return pumpSpeedReference(robot, cmd_vel, ref, self);
 }
 
 /** Codel smoothStopTrack of activity Track.
  *
  * Triggered by rmp440_end.
  * Yields to rmp440_ether.
- * Throws rmp440_port_not_found, rmp440_bad_ref,
+ * Throws rmp440_not_connected, rmp440_port_not_found, rmp440_bad_ref,
  *        rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
  */

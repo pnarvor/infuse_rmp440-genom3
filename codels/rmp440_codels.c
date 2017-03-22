@@ -26,6 +26,26 @@
 
 #include "rmp440_Log.h"
 
+/* --- Activity Track --------------------------------------------------- */
+
+/** Validation codel trackControl of activity Track.
+ *
+ * Returns genom_ok.
+ * Throws rmp440_port_not_found, rmp440_bad_ref,
+ * rmp440_cmd_stop_track, rmp440_motors_off, rmp440_emergency_stop,
+ * rmp440_power_cord_connected.
+ */
+genom_event
+trackControl(const rmp440_io *rmp, const rmp440_feedback *rs_data,
+             genom_context self)
+{
+	if (rmp == NULL)
+		return rmp440_not_connected(self);
+
+	return genom_ok;
+}
+
+
 /* --- Function log ----------------------------------------------------- */
 
 /** Codel log_start of function log.

@@ -33,6 +33,7 @@ component rmp440 {
   codels-require "rmp440-libs >= 0.5, gyro-libs, felib";
 
   exception already_initialized;
+  exception not_connected;
   exception malloc_error;
   exception bad_ref;
   exception rmplib_error;
@@ -147,7 +148,9 @@ component rmp440 {
 
   activity Track() {
     doc  "Start tracking a reference port";
-    codel <start>trackStart(port in cmd_vel) yield track_main, end;
+    validate trackControl(in rmp, in rs_data);
+    codel <start>trackStart(inout rs_mode,
+			    port in cmd_vel) yield track_main, end;
     codel <track_main>pumpReference(in robot,
 			      in rs_mode,
 			      port in cmd_vel,
@@ -157,7 +160,7 @@ component rmp440 {
 			       inout rs_mode,
 			       out ref) yield ether;
     task TrackTask;
-    throw port_not_found, bad_ref, cmd_stop_track,
+    throw not_connected, port_not_found, bad_ref, cmd_stop_track,
       motors_off, emergency_stop, power_cord_connected;
     interrupts JoystickOn, Track;
   };
