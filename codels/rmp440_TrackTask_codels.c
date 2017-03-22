@@ -110,16 +110,10 @@ smoothStopTrack(const or_genpos_cart_state *robot,
 {
 	printf("rmp440 smoothStopTrack\n");
 
-	if (*track_mode == or_genpos_track_speed) {
-		/* Set a null speed and stop the tracking */
-		/* XXX should compute a decceleration ramp */
-		track_mode = or_genpos_no_tracking;
-		ref->v = 0.0;
-		ref->w = 0.0;
-	} else {
-		return rmp440_bad_track_mode(self);
-	}
-	*track_mode = or_genpos_no_tracking;
+	/* Set a null speed and stop the tracking */
+	/* XXX should compute a decceleration ramp */
+	ref->v = 0.0;
+	ref->w = 0.0;
 	*rs_mode = rmp440_mode_idle;
 	return rmp440_ether;
 }
