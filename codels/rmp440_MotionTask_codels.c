@@ -149,6 +149,8 @@ initOdoAndAsserv(rmp440_ids *ids,
 	memset(statusgen, 0, sizeof(rmp_status_str));
 	statusgen->robot_model = rmp_model_440;
 
+	ids->rs_mode = rmp440_mode_idle;
+
 	/* Kinematics */
 	kinematics->leftWheelRadius = RMP_X2_TIRE_DIAMETER/2.0;
 	kinematics->rightWheelRadius = RMP_X2_TIRE_DIAMETER/2.0;
@@ -291,6 +293,7 @@ odoAndAsserv(const rmp440_io *rmp,
 		break;
 
 	default:
+		printf("-- invalid rs_mode %d\n", *rs_mode);
 		return rmp440_end;
 	}
 	if (report != genom_ok) {
@@ -345,6 +348,7 @@ endOdoAndAsserv(rmp440_io **rmp, rmp440_feedback **rs_data,
 {
 	rmp440_feedback *data = *rs_data;
 
+	printf("-- %s\n", __func__);
 	if (*rmp == NULL)
 		return rmp440_ether;
 	if (data->operational_state == 4)
