@@ -58,7 +58,7 @@ rmp440DataUpdate(rmp440_feedback *data, FE_STR *fe,
 		status->rs_mode = statusgen->rs_mode = rmp440_mode_motors_off;
 
 	status->rs_data.timestamp.sec = data->timestamp.tv_sec;
-	status->rs_data.timestamp.nsec = data->timestamp.tv_sec;
+	status->rs_data.timestamp.nsec = data->timestamp.tv_nsec;
 	status->rs_data.fault_status[0] = data->fault_status[0];
 	status->rs_data.fault_status[1] = data->fault_status[1];
 	status->rs_data.fault_status[2] = data->fault_status[2];
