@@ -35,7 +35,6 @@ component rmp440 {
   exception already_initialized;
   exception malloc_error;
   exception bad_ref;
-  exception bad_track_mode;
   exception rmplib_error;
   exception joystick_error;
   exception gyro_error;
@@ -67,7 +66,6 @@ component rmp440 {
     kinematics_str kinematics;
     dynamic_str dynamics;
     var_params var_params;
-    or::genpos::track_mode track_mode;
     GYRO_DATA gyroId;
     gyro gyro;
     gyro_asserv gyro_asserv;
@@ -95,7 +93,6 @@ component rmp440 {
 			    inout var,
 			    inout ref,
 			    inout max_accel,
-			    inout track_mode,
 			    out rs_data,
 			    out rs_mode,
 			    out gyro,
@@ -148,22 +145,19 @@ component rmp440 {
 
   /*----------------------------------------------------------------------*/
 
-  activity Track(in or::genpos::track_mode mode = 
-		 or::genpos::track_speed: "Tracking mode") {
+  activity Track() {
     doc  "Start tracking a reference port";
-    codel <start>trackStart(port in cmd_vel, in mode) yield track_main, end;
+    codel <start>trackStart(port in cmd_vel) yield track_main, end;
     codel <track_main>pumpReference(in robot,
 			      in rs_mode,
-			      in track_mode,
 			      port in cmd_vel,
 			      out ref) yield pause::track_main, end;
     codel <end>smoothStopTrack(in robot,
 			       in dynamics,
 			       inout rs_mode,
-			       inout track_mode,
 			       out ref) yield ether;
     task TrackTask;
-    throw port_not_found, bad_track_mode, bad_ref, cmd_stop_track, 
+    throw port_not_found, bad_ref, cmd_stop_track,
       motors_off, emergency_stop, power_cord_connected;
     interrupts JoystickOn, Track;
   };

@@ -57,13 +57,12 @@ pumpSpeedReference(const or_genpos_cart_state *robot,
  *
  * Triggered by rmp440_start.
  * Yields to rmp440_track_main, rmp440_end.
- * Throws rmp440_port_not_found, rmp440_bad_track_mode,
- *        rmp440_bad_ref, rmp440_cmd_stop_track, rmp440_motors_off,
+ * Throws rmp440_port_not_found, rmp440_bad_ref,
+ *        rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
  */
 genom_event
-trackStart(const rmp440_cmd_vel *cmd_vel, or_genpos_track_mode mode,
-           genom_context self)
+trackStart(const rmp440_cmd_vel *cmd_vel, genom_context self)
 {
 	if (cmd_vel->read(self) != genom_ok)
 		return rmp440_port_not_found(self);
@@ -74,13 +73,12 @@ trackStart(const rmp440_cmd_vel *cmd_vel, or_genpos_track_mode mode,
  *
  * Triggered by rmp440_track_main.
  * Yields to rmp440_pause_track_main, rmp440_end.
- * Throws rmp440_port_not_found, rmp440_bad_track_mode,
- *        rmp440_bad_ref, rmp440_cmd_stop_track, rmp440_motors_off,
+ * Throws rmp440_port_not_found, rmp440_bad_ref,
+ *        rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
  */
 genom_event
 pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
-              or_genpos_track_mode track_mode,
               const rmp440_cmd_vel *cmd_vel, or_genpos_cart_speed *ref,
               genom_context self)
 {
@@ -93,28 +91,22 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
 		return rmp440_motors_off(self);
 	}
 
-	switch (track_mode) {
-	case or_genpos_track_speed:
-		return pumpSpeedReference(robot, cmd_vel, ref, self);
-	default:
-		return  rmp440_bad_track_mode(self);
-
-	}
+	return pumpSpeedReference(robot, cmd_vel, ref, self);
 }
 
 /** Codel smoothStopTrack of activity Track.
  *
  * Triggered by rmp440_end.
  * Yields to rmp440_ether.
- * Throws rmp440_port_not_found, rmp440_bad_track_mode,
- *        rmp440_bad_ref, rmp440_cmd_stop_track, rmp440_motors_off,
+ * Throws rmp440_port_not_found, rmp440_bad_ref,
+ *        rmp440_cmd_stop_track, rmp440_motors_off,
  *        rmp440_emergency_stop, rmp440_power_cord_connected.
  */
 genom_event
 smoothStopTrack(const or_genpos_cart_state *robot,
                 const rmp440_dynamic_str *dynamics,
-                rmp440_mode *rs_mode, or_genpos_track_mode *track_mode,
-                or_genpos_cart_speed *ref, genom_context self)
+                rmp440_mode *rs_mode, or_genpos_cart_speed *ref,
+                genom_context self)
 {
 	printf("rmp440 smoothStopTrack\n");
 

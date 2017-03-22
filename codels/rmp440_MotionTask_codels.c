@@ -204,11 +204,10 @@ odoAndAsserv(const rmp440_io *rmp,
              const rmp440_Joystick *Joystick, GYRO_DATA **gyroId,
              FE_STR **fe, or_genpos_cart_state *robot,
              or_genpos_cart_config_var *var, or_genpos_cart_speed *ref,
-             rmp440_max_accel *max_accel,
-             or_genpos_track_mode *track_mode,
-             rmp440_feedback **rs_data, rmp440_mode *rs_mode,
-             rmp440_gyro *gyro, rmp440_gyro_asserv *gyro_asserv,
-             const rmp440_Pose *Pose, const rmp440_Status *Status,
+             rmp440_max_accel *max_accel, rmp440_feedback **rs_data,
+             rmp440_mode *rs_mode, rmp440_gyro *gyro,
+             rmp440_gyro_asserv *gyro_asserv, const rmp440_Pose *Pose,
+             const rmp440_Status *Status,
              const rmp440_StatusGeneric *StatusGeneric,
              genom_context self)
 {
@@ -284,8 +283,6 @@ odoAndAsserv(const rmp440_io *rmp,
 
 	case rmp440_mode_track:
 		/* ref has beed updated by the trackTask */
-		if (*track_mode != or_genpos_track_speed)
-			report = rmp440_bad_track_mode(self);
 		break;
 
 	default:
@@ -295,7 +292,6 @@ odoAndAsserv(const rmp440_io *rmp,
 		/* In case an error occured,
 		   stop the robot and the tracking */
 		*rs_mode = statusgen->rs_mode = rmp440_mode_idle;
-		*track_mode = or_genpos_no_tracking;
 
 		ref->v = 0;
 		ref->w = 0;
