@@ -219,13 +219,18 @@ odoAndAsserv(const rmp440_io *rmp,
 	genom_event report = genom_ok;
 	struct cmd_str cmd;
 
-	if (rmp == NULL)
+	if (rmp == NULL) {
+		StatusGeneric->write(self);
 		return rmp440_pause_odo; /* not initialized yet */
+	}
 
 	if (rmp440ReceiveAndDecode(rmp, data) < 0) {
 		/* Probably motors OFF - no communication on the RMP440 */
 		status->rs_mode = statusgen->rs_mode = rmp440_mode_motors_off;
 		rmp440CmdNone(rmp);
+		/* Publish Pose and Status Generic */
+		Pose->write(self);
+		StatusGeneric->write(self);
 		return rmp440_pause_odo;
 	}
 
