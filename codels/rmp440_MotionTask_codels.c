@@ -146,6 +146,7 @@ initOdoAndAsserv(rmp440_ids *ids,
 	rmp440_gyro_asserv *gyro_asserv = &ids->gyro_asserv;
 	rmp440_max_accel *max_accel = &ids->max_accel;
 
+	memset(statusgen, 0, sizeof(rmp_status_str));
 	statusgen->robot_model = rmp_model_440;
 
 	/* Kinematics */
@@ -180,7 +181,6 @@ initOdoAndAsserv(rmp440_ids *ids,
 	gyro_asserv->enabled = 0;
 	gyro_asserv->first = 1;
 	gyro_asserv->straight = 0;
-
 
 	/* max accel */
 	max_accel->prev_vel_command = 0.;
