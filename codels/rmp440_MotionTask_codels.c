@@ -146,7 +146,7 @@ initOdoAndAsserv(rmp440_ids *ids,
 	rmp440_gyro_asserv *gyro_asserv = &ids->gyro_asserv;
 	rmp440_max_accel *max_accel = &ids->max_accel;
 
-	statusgen->rmp_model = rmp_model_440;
+	statusgen->robot_model = rmp_model_440;
 
 	/* Kinematics */
 	kinematics->leftWheelRadius = RMP_X2_TIRE_DIAMETER/2.0;

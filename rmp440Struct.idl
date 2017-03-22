@@ -233,7 +233,7 @@ module rmp {
 
   struct status_str {
     double receive_date;
-    model rmp_model;
+    model robot_model;
     rmp440::mode rs_mode;
     double propulsion_battery_level;
     double aux_battery_level;
