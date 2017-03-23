@@ -27,7 +27,7 @@
 #include "or/pose/pose_estimator.gen"
 
 component rmp440 {
-  version "0.1";
+  version "0.1.99";
   email "openrobots@laas.fr";
   lang "c";
   codels-require "rmp440-libs >= 0.5, gyro-libs, felib";
