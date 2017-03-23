@@ -21,9 +21,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <portLib.h>
-#include <h2timeLib.h>
-
 #include <rmp440/rmp440.h>
 #include <fe/ftdi-emergency.h>
 
