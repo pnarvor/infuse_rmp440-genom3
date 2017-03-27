@@ -2,7 +2,7 @@ dnl Autoconf file for building rmp440 codels library.
 
 AC_PREREQ(2.59)
 
-AC_INIT([rmp440-genom3],[0.1],[openrobots@laas.fr])
+AC_INIT([rmp440-genom3],[0.1.99],[openrobots@laas.fr])
 AC_CONFIG_MACRO_DIR([autoconf])
 AC_CONFIG_AUX_DIR([autoconf])
 AC_CONFIG_HEADERS([autoconf/acrmp440.h])
