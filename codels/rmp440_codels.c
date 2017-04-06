@@ -31,7 +31,7 @@
 /** Validation codel trackControl of activity Track.
  *
  * Returns genom_ok.
- * Throws rmp440_port_not_found, rmp440_bad_ref,
+ * Throws rmp440_not_connected, rmp440_port_not_found, rmp440_bad_ref,
  * rmp440_cmd_stop_track, rmp440_motors_off, rmp440_emergency_stop,
  * rmp440_power_cord_connected.
  */
