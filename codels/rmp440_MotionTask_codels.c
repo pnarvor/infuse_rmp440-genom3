@@ -168,6 +168,7 @@ initOdoAndAsserv(rmp440_ids *ids,
 	/* Ref Data */
 	ref->v = 0.;
 	ref->w = 0.;
+	/* XXX These 4 values are not used. */
 	ref->vmax = RMP_DEFAULT_MAXIMUM_VELOCITY;
 	ref->wmax = RMP_DEFAULT_MAXIMUM_YAW_RATE;
 	ref->linAccelMax = RMP_DEFAULT_MAXIMUM_ACCEL;
@@ -454,7 +455,7 @@ rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
 	kinematics->leftWheelRadius = data->fram_tire_diameter/2.0;
 	kinematics->rightWheelRadius = data->fram_tire_diameter/2.0;
 	kinematics->axisWidth = data->fram_wheel_track_width;
-	/* dynamics */
+	/* dynamics - XXX unused */
 	dynamics->vMax = data->vel_limit;
 	dynamics->wMax = data->yaw_rate_limit;
 	dynamics->linAccelMax = data->fram_accel_limit;
