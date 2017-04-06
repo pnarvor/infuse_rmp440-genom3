@@ -285,7 +285,7 @@ rmp440VelocitySet(const rmp440_io *rmp, const rmp440_feedback *data,
  * to respect the circle's radius
  */
 void
-bound_accels(rmp440_max_accel *acc, double t,
+bound_accels(const rmp440_feedback *data, rmp440_max_accel *acc, double t,
     double *vel_reference, double *ang_reference)
 {
 	const double epsilon = 1e-3;
@@ -303,7 +303,7 @@ bound_accels(rmp440_max_accel *acc, double t,
 		*vel_reference = 0.0;
 
 	double max_accel = fabs(acc->prev_vel_command) < fabs(*vel_reference) ?
-	    RMP_DEFAULT_MAXIMUM_ACCEL : RMP_DEFAULT_MAXIMUM_DECEL;
+	    data->fram_accel_limit : data->fram_decel_limit;
 	double max_vel = acc->prev_vel_command +
 	    sign_accel * max_accel * rmp440_sec_period;
 	*vel_reference = sign_accel *

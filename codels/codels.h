@@ -35,7 +35,8 @@ extern void rmp440VelocityGet(const rmp440_feedback *data,
     or_genpos_cart_state *robot);
 extern void rmp440VelocitySet(const rmp440_io *rmp, const rmp440_feedback *data,
     double v, double w, double *vCommand, double *wCommand);
-extern void bound_accels(rmp440_max_accel *acc, double t,
+extern void bound_accels(const rmp440_feedback *data,
+    rmp440_max_accel *acc, double t,
     double *vel_reference, double *ang_reference);
 extern void control_yaw(rmp440_gyro_asserv *gyro,
     double t, double vel_reference, double yawr_reference,

@@ -313,7 +313,7 @@ odoAndAsserv(const rmp440_io *rmp,
 	/* Adjustements depending on the robot */
 	double t = data->timestamp.tv_sec + data->timestamp.tv_nsec*1e-9;
 	if (*rs_mode == rmp440_mode_track)
-		bound_accels(max_accel, t, &ref->v, &ref->w);
+		bound_accels(data, max_accel, t, &ref->v, &ref->w);
 
 	if (gyro->gyroOn)
 		control_yaw(gyro_asserv, t, ref->v, ref->w,
