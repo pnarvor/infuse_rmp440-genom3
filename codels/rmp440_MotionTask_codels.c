@@ -562,8 +562,7 @@ genom_event
 rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_speed *ref,
                       genom_context self)
 {
-	//ref->linAccelMax = rmp_default_maximum_accel;
-	//ref->angAccelMax = rmp_default_maximum_yaw_rate;
+
 	printf("%s\n", __func__);
 	*rs_mode = rmp440_mode_idle; /* XXXXXX */
 	return rmp440_ether;
