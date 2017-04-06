@@ -39,19 +39,6 @@ module rmp440 {
   const double kp_gyro_theta = 10.0;
   const double ki_gyro_theta = 2.0;
 
-  // max errors
-  const double longit_max_gap = 0.5;
-  const double transv_max_gap = 0.5;
-  const double ang_max_gap = 0.5;
-
-  const double longit_error_max = 0.5;
-  const double transv_error_max = 0.5;
-  const double ang_error_max = 0.5;
-
-  const double longit_max_err_sum = 1.0;
-  const double transv_max_err_sum = 1.0;
-  const double ang_max_err_sum = 1.0;
-
   // joystick
   const double joystick_vgain = 1./(32768.0*32768.0); /* 1 m/s max */
   const double joystick_wgain = 1./(32768.0*32768.0); /* 1 rad/s max */
