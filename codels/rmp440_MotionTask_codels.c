@@ -142,6 +142,7 @@ initOdoAndAsserv(rmp440_ids *ids,
                  const rmp440_StatusGeneric *StatusGeneric,
                  const genom_context self)
 {
+    printf("Started rmp440-c\n\n");
 	rmp_status_str *statusgen = StatusGeneric->data(self);
 	rmp440_kinematics_str *kinematics = &ids->kinematics;
 	or_genpos_cart_state *robot = &ids->robot;
