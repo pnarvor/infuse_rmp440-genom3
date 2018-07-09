@@ -33,7 +33,7 @@ component rmp440 {
   version "0.1.99";
   email "openrobots@laas.fr";
   lang "c";
-  codels-require "rmp440-libs >= 0.5, gyro-libs, felib";
+  codels-require "rmp440-libs >= 0.5, gyro-libs, felib, cdff_types";
 
   exception already_initialized;
   exception not_connected;
