@@ -26,6 +26,9 @@
 #include "or/hid/joystick.gen"
 #include "or/pose/pose_estimator.gen"
 
+#pragma require "infuse_types-genom3 >= 0.1"
+#include "infuse_types/asn1/bitstream.idl"
+
 component rmp440 {
   version "0.1.99";
   email "openrobots@laas.fr";
@@ -49,6 +52,7 @@ component rmp440 {
   port in or::genpos::cart_speed cmd_vel;
   port in or_joystick::state Joystick;
   port out or_pose_estimator::state Pose;
+  port out asn1::bitstream PoseInfuse;
   port out status_str Status;
   port out rmp::status_str StatusGeneric;
 
@@ -81,7 +85,7 @@ component rmp440 {
   task MotionTask {
     period sec_period s;
     stack 65536;
-    codel <start>initOdoAndAsserv(out ::ids, out StatusGeneric) 
+    codel <start>initOdoAndAsserv(out ::ids, out PoseInfuse, out StatusGeneric) 
       yield ether, odo;
     codel <odo>odoAndAsserv(in rmp,
 			    in kinematics,
@@ -99,6 +103,7 @@ component rmp440 {
 			    out gyro,
 			    out gyro_asserv,
 			    out Pose,
+                out PoseInfuse,
 			    out Status,
 			    out StatusGeneric) yield ether, pause::odo, end;
     codel <end>endOdoAndAsserv(inout rmp, inout rs_data) yield ether;
