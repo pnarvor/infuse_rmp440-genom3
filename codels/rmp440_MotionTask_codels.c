@@ -196,15 +196,15 @@ initOdoAndAsserv(rmp440_ids *ids,
 	max_accel->prev_vel_command = 0.;
 	max_accel->prev_vel_command_t = -1.;
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    //preparing bitstream output
-    asn1_bitstream* gbstream = PoseInfuse->data(self);
+    //////////////////////////////////////////////////////////////////////////////////////
+    ////preparing bitstream output
+    //asn1_bitstream* gbstream = PoseInfuse->data(self);
 
-    gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
-    gbstream->data._length = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
-    gbstream->data._release = NULL;
-    gbstream->data._buffer = malloc(sizeof(uint8_t)*Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
-    ////////////////////////////////////////////////////////////////////////////////////
+    //gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    //gbstream->data._length = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    //gbstream->data._release = NULL;
+    //gbstream->data._buffer = malloc(sizeof(uint8_t)*Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    //////////////////////////////////////////////////////////////////////////////////////
 
 	return rmp440_odo;
 }
@@ -354,13 +354,21 @@ odoAndAsserv(const rmp440_io *rmp,
     
     
     ////////////////////////////////////////////////////////////////////////////////////
-    /////////////////// Infuse : Publish pose as asn1::bitstream
+    //preparing bitstream output
+    ////////////////////////////////////////////////////////////////////////////////////
     Pose_InFuse asnPose;
     asn1_bitstream* gbstream = PoseInfuse->data(self);
+    uint8_t portBuffer[Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING];
     if(!gbstream || !pose)
         return rmp440_pause_odo;
-    if(!gbstream->data._buffer)
-        return rmp440_pause_odo;
+
+    gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    gbstream->data._length = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    gbstream->data._release = NULL;
+    gbstream->data._buffer = portBuffer;
+        
+    //if(!gbstream->data._buffer)
+    //    return rmp440_pause_odo;
     
     struct timeval tv;
     gettimeofday(&tv,NULL);
