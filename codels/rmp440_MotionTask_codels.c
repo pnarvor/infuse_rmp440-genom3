@@ -199,11 +199,16 @@ initOdoAndAsserv(rmp440_ids *ids,
     ////////////////////////////////////////////////////////////////////////////////////
     //preparing bitstream output
     asn1_bitstream* gbstream = PoseInfuse->data(self);
+    genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    gbstream->data._length = 0;
+    gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
+    sprintf(gbstream->type, "Pose_InFuse");
+    gbstream->serialization_method = 0; //uPER
 
-    gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
-    gbstream->data._length = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
-    gbstream->data._release = NULL;
-    gbstream->data._buffer = malloc(sizeof(uint8_t)*Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    //gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    //gbstream->data._length = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    //gbstream->data._release = NULL;
+    //gbstream->data._buffer = malloc(sizeof(uint8_t)*Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
     ////////////////////////////////////////////////////////////////////////////////////
 
 	return rmp440_odo;
@@ -360,6 +365,7 @@ odoAndAsserv(const rmp440_io *rmp,
     if(!gbstream || !pose)
         return rmp440_pause_odo;
     if(!gbstream->data._buffer)
+
         return rmp440_pause_odo;
     
     struct timeval tv;
