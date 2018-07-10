@@ -53,6 +53,8 @@
 
 #define DEBUG 2
 
+#define DEBUG 2
+
 /* --- Task MotionTask -------------------------------------------------- */
 
 static void
@@ -72,6 +74,11 @@ gyroUpdate(GYRO_DATA **gyroId, rmp440_gyro *gyro,
 			*gyroId = NULL;
 		}
 		else {
+#if DEBUG>1
+	if (count==10) {
+          printf("Read gyro, theta : %5.2f, omega : %5.2f\n", gyro->gyroTheta, gyro->gyroOmega);
+    }
+#endif
 		  gyro->gyroTheta = - gyro->gyroTheta;
 		  gyro->gyroOmega = - gyro->gyroOmega;
 		}
