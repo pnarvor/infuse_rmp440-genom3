@@ -51,6 +51,8 @@
 #include <sys/time.h>
 ////////////////////////////////////////////////////////////////////////////////
 
+#define DEBUG 2
+
 /* --- Task MotionTask -------------------------------------------------- */
 
 static void
@@ -140,7 +142,7 @@ yawToQuaternion(double yaw, or_t3d_pos *pos)
  * Throws rmp440_emergency_stop.
  */
 genom_event
-initOdoAndAsserv(rmp440_ids *ids,
+initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
                  const rmp440_StatusGeneric *StatusGeneric,
                  const genom_context self)
 {
@@ -232,6 +234,7 @@ odoAndAsserv(const rmp440_io *rmp,
              rmp440_max_accel *max_accel, rmp440_feedback **rs_data,
              rmp440_mode *rs_mode, rmp440_gyro *gyro,
              rmp440_gyro_asserv *gyro_asserv, const rmp440_Pose *Pose,
+             const rmp440_PoseInfuse *PoseInfuse,
              const rmp440_Status *Status,
              const rmp440_StatusGeneric *StatusGeneric,
              const genom_context self)
