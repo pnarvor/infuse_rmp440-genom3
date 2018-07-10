@@ -349,6 +349,78 @@ odoAndAsserv(const rmp440_io *rmp,
 	Pose->write(self);
 	Status->write(self);
 	StatusGeneric->write(self);
+    
+    
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////////
+    /////////////////// Infuse : Publish pose as asn1::bitstream
+    Pose_InFuse asnPose;
+    asn1_bitstream* gbstream = PoseInfuse->data(self);
+    if(!gbstream || !pose)
+        return rmp440_pause_odo;
+    if(!gbstream->data._buffer)
+        return rmp440_pause_odo;
+    
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    
+    long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
+    gbstream->header.seq = gbstream->header.seq + 1;
+    gbstream->header.stamp.sec = timeNow / 1000000;
+    gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
+    
+    asnPose.msgVersion = pose_InFuse_Version;
+
+    strcpy(asnPose.parentFrameId.arr, "LocalTerrainFrame");
+    asnPose.parentFrameId.nCount = strlen(asnPose.parentFrameId.arr);
+    asnPose.parentTime.microseconds  = timeNow;
+    asnPose.parentTime.usecPerSec = 1000000;
+
+    strcpy(asnPose.childFrameId.arr, "RoverBodyFrame");
+    asnPose.childFrameId.nCount = strlen(asnPose.childFrameId.arr);
+    asnPose.childTime.microseconds  = timeNow;
+    asnPose.childTime.usecPerSec = 1000000;
+    
+    asnPose.transform.translation.nCount = 3;
+    asnPose.transform.translation.arr[0] = pose->pos._value.x;
+    asnPose.transform.translation.arr[1] = pose->pos._value.y;
+    asnPose.transform.translation.arr[2] = pose->pos._value.z;
+
+    asnPose.transform.orientation.nCount = 4;
+    asnPose.transform.orientation.arr[0] = pose->pos._value.qx;
+    asnPose.transform.orientation.arr[1] = pose->pos._value.qy;
+    asnPose.transform.orientation.arr[2] = pose->pos._value.qz;
+    asnPose.transform.orientation.arr[3] = pose->pos._value.qw;
+
+    // TODO translate or_pose_estimator covariance to envire covariance
+    asnPose.transform.cov.nCount = 6;
+    for(int i = 0; i < 6; i++)
+    {
+        asnPose.transform.cov.arr[i].nCount = 6;
+        for(int j = 0; j < 6; j++)
+        {
+            asnPose.transform.cov.arr[i].arr[j] = 0;
+        }
+    }
+    // to have a well defined cov matrix :
+    for(int i = 0; i < 6; i++)
+        asnPose.transform.cov.arr[i].arr[i] = 1e-6;
+
+    flag res;
+    int errorCode;
+    BitStream bstream;
+    BitStream_Init(&bstream, gbstream->data._buffer, Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    res = Pose_InFuse_Encode(&asnPose, &bstream, &errorCode, TRUE);
+    if(!res)
+    {
+        printf("error, Pose_Infuse encoding error : %d\n", errorCode);
+	    return rmp440_pause_odo;
+    }
+
+    PoseInfuse->write(self);
+    /////////////////// Infuse : end
+    ////////////////////////////////////////////////////////////////////////////////////
 
 	return rmp440_pause_odo;
 }
