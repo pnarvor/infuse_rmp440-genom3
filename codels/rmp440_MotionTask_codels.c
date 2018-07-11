@@ -150,7 +150,7 @@ yawToQuaternion(double yaw, or_t3d_pos *pos)
  * Throws rmp440_emergency_stop.
  */
 genom_event
-initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
+initOdoAndAsserv(rmp440_ids *ids,
                  const rmp440_StatusGeneric *StatusGeneric,
                  const genom_context self)
 {
@@ -206,33 +206,40 @@ initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
 	max_accel->prev_vel_command = 0.;
 	max_accel->prev_vel_command_t = -1.;
 
-    ////////////////////////////////////////////////////////////////////////////////////
-    //preparing bitstream output
-    asn1_bitstream* gbstream = PoseInfuse->data(self);
-    
-    // Init bitstream header
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
-    gbstream->header.seq = 0;
-    gbstream->header.stamp.sec = timeNow / 1000000;
-    gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
-    gbstream->header.frame_id = (char*)malloc(sizeof(char)*(1 + strlen("RoverBodyFrame")));
-    sprintf(gbstream->header.frame_id, "RoverBodyFrame");
+    //////////////////////////////////////////////////////////////////////////////////////
+    ////preparing bitstream output
+    //asn1_bitstream* gbstream = PoseInfuse->data(self);
+    //if(!gbstream)
+    //{
+    //    printf("Error getting port bstream at initialization !\n");
+	//    return rmp440_start;
+    //}
+    //
+    //// Init bitstream header
+    //struct timeval tv;
+    //gettimeofday(&tv,NULL);
+    //long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
+    //gbstream->header.seq = 0;
+    //gbstream->header.stamp.sec = timeNow / 1000000;
+    //gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
+    //gbstream->header.frame_id = (char*)malloc(sizeof(char)*(1 + strlen("RoverBodyFrame")));
+    //sprintf(gbstream->header.frame_id, "RoverBodyFrame");
    
-    // Init bistream type
-    gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
-    sprintf(gbstream->type, "Pose_InFuse");
-    gbstream->serialization_method = 0; //uPER
-    //reserve memory for serialized data 
+    //// Init bistream type
+    //gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
+    //sprintf(gbstream->type, "Pose_InFuse");
+    //gbstream->serialization_method = 0; //uPER
+    ////reserve memory for serialized data 
     //genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
     //gbstream->data._length = 0;
 
-    gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
-    gbstream->data._length = 0;
-    gbstream->data._release = NULL;
-    gbstream->data._buffer = malloc(sizeof(uint8_t)*Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
-    ////////////////////////////////////////////////////////////////////////////////////
+    ////gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    ////gbstream->data._length = 0;
+    ////gbstream->data._release = NULL;
+    ////gbstream->data._buffer = malloc(sizeof(uint8_t)*Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    //////////////////////////////////////////////////////////////////////////////////////
+
+    ////printf("init ok\n");
 
 	return rmp440_odo;
 }
@@ -382,77 +389,84 @@ odoAndAsserv(const rmp440_io *rmp,
     
     
     
-    ////////////////////////////////////////////////////////////////////////////////////
-    /////////////////// Infuse : Publish pose as asn1::bitstream
-    Pose_InFuse asnPose;
-    asn1_bitstream* gbstream = PoseInfuse->data(self);
-    if(!gbstream || !pose)
-        return rmp440_pause_odo;
-    if(!gbstream->data._buffer)
+    //////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////// Infuse : Publish pose as asn1::bitstream
+    //if(!pose)
+    //    return rmp440_pause_odo;
 
-        return rmp440_pause_odo;
-    
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    
-    long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
-    gbstream->header.seq = gbstream->header.seq + 1;
-    gbstream->header.stamp.sec = timeNow / 1000000;
-    gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
-    
-    asnPose.msgVersion = pose_InFuse_Version;
+    //struct timeval tv;
+    //gettimeofday(&tv,NULL);
+    //long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
+    //
+    //Pose_InFuse asnPose;
+    //asnPose.msgVersion = pose_InFuse_Version;
 
-    strcpy(asnPose.parentFrameId.arr, "LocalTerrainFrame");
-    asnPose.parentFrameId.nCount = strlen(asnPose.parentFrameId.arr) + 1;
-    asnPose.parentTime.microseconds  = timeNow;
-    asnPose.parentTime.usecPerSec = 1000000;
+    ////strcpy(asnPose.parentFrameId.arr, "LocalTerrainFrame");
+    //sprintf(asnPose.parentFrameId.arr, "LocalTerrainFrame");
+    //asnPose.parentFrameId.nCount = strlen(asnPose.parentFrameId.arr) + 1;
+    //asnPose.parentTime.microseconds  = timeNow;
+    //asnPose.parentTime.usecPerSec = 1000000;
 
-    strcpy(asnPose.childFrameId.arr, "RoverBodyFrame");
-    asnPose.childFrameId.nCount = strlen(asnPose.childFrameId.arr) + 1;
-    asnPose.childTime.microseconds  = timeNow;
-    asnPose.childTime.usecPerSec = 1000000;
-    
-    asnPose.transform.translation.nCount = 3;
-    asnPose.transform.translation.arr[0] = pose->pos._value.x;
-    asnPose.transform.translation.arr[1] = pose->pos._value.y;
-    asnPose.transform.translation.arr[2] = pose->pos._value.z;
+    ////strcpy(asnPose.childFrameId.arr, "RoverBodyFrame");
+    //sprintf(asnPose.childFrameId.arr, "RoverBodyFrame");
+    //asnPose.childFrameId.nCount = strlen(asnPose.childFrameId.arr) + 1;
+    //asnPose.childTime.microseconds  = timeNow;
+    //asnPose.childTime.usecPerSec = 1000000;
+    //
+    //asnPose.transform.translation.nCount = 3;
+    //asnPose.transform.translation.arr[0] = pose->pos._value.x;
+    //asnPose.transform.translation.arr[1] = pose->pos._value.y;
+    //asnPose.transform.translation.arr[2] = pose->pos._value.z;
 
-    asnPose.transform.orientation.nCount = 4;
-    asnPose.transform.orientation.arr[0] = pose->pos._value.qx;
-    asnPose.transform.orientation.arr[1] = pose->pos._value.qy;
-    asnPose.transform.orientation.arr[2] = pose->pos._value.qz;
-    asnPose.transform.orientation.arr[3] = pose->pos._value.qw;
+    //asnPose.transform.orientation.nCount = 4;
+    //asnPose.transform.orientation.arr[0] = pose->pos._value.qx;
+    //asnPose.transform.orientation.arr[1] = pose->pos._value.qy;
+    //asnPose.transform.orientation.arr[2] = pose->pos._value.qz;
+    //asnPose.transform.orientation.arr[3] = pose->pos._value.qw;
 
-    // TODO translate or_pose_estimator covariance to envire covariance
-    asnPose.transform.cov.nCount = 6;
-    for(int i = 0; i < 6; i++)
-    {
-        asnPose.transform.cov.arr[i].nCount = 6;
-        for(int j = 0; j < 6; j++)
-        {
-            asnPose.transform.cov.arr[i].arr[j] = 0;
-        }
-    }
-    // to have a well defined cov matrix :
-    for(int i = 0; i < 6; i++)
-        asnPose.transform.cov.arr[i].arr[i] = 1e-6;
+    //// TODO translate or_pose_estimator covariance to envire covariance
+    //asnPose.transform.cov.nCount = 6;
+    //for(int i = 0; i < 6; i++)
+    //{
+    //    asnPose.transform.cov.arr[i].nCount = 6;
+    //    for(int j = 0; j < 6; j++)
+    //    {
+    //        asnPose.transform.cov.arr[i].arr[j] = 0;
+    //    }
+    //}
+    //// to have a well defined cov matrix :
+    //for(int i = 0; i < 6; i++)
+    //    asnPose.transform.cov.arr[i].arr[i] = 1e-6;
+    //
+    //asn1_bitstream* gbstream = PoseInfuse->data(self);
+    //if(!gbstream || !pose)
+    //    return rmp440_pause_odo;
+    //if(!gbstream->data._buffer)
+    //    return rmp440_pause_odo;
+    //
+    //gbstream->header.seq = gbstream->header.seq + 1;
+    //gbstream->header.stamp.sec = timeNow / 1000000;
+    //gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
+    //
 
-    flag res;
-    int errorCode;
-    BitStream bstream;
-    BitStream_Init(&bstream, gbstream->data._buffer, Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
-    res = Pose_InFuse_Encode(&asnPose, &bstream, &errorCode, TRUE);
-    if(!res)
-    {
-        printf("error, Pose_Infuse encoding error : %d\n", errorCode);
-	    return rmp440_pause_odo;
-    }
+    //flag res;
+    //int errorCode;
+    //BitStream bstream;
+    //BitStream_Init(&bstream, gbstream->data._buffer, Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    //res = Pose_InFuse_Encode(&asnPose, &bstream, &errorCode, TRUE);
+    //if(!res)
+    //{
+    //    printf("error, Pose_Infuse encoding error : %d\n", errorCode);
+	//    return rmp440_pause_odo;
+    //}
+    //printf("Count : %d/%d\n", bstream.count, Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
     //Set encoded size in bistream
-    gbstream->data._length = bstream.count;
+    //gbstream->data._length = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    //gbstream->data._length = bstream.count;
 
-    PoseInfuse->write(self);
-    /////////////////// Infuse : end
-    ////////////////////////////////////////////////////////////////////////////////////
+    //PoseInfuse->write(self);
+    ///////////////////// Infuse : end
+    //////////////////////////////////////////////////////////////////////////////////////
 
 	return rmp440_pause_odo;
 }
@@ -543,6 +557,7 @@ genom_event
 rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
                rmp440_mode *rs_mode, rmp440_dynamic_str *dynamics,
                rmp440_kinematics_str *kinematics,
+               const rmp440_PoseInfuse *PoseInfuse,
                const genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
@@ -592,8 +607,43 @@ rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
 	if (data->fram_accel_limit != data->fram_decel_limit)
 		printf("WARNING fram_accel_limit != fram_decel_limit %f %f\n",
 		    data->fram_accel_limit, data->fram_decel_limit);
-
 	rmp440CmdNone(*rmp);
+    
+    ////////////////////////////////////////////////////////////////////////////////////
+    //preparing bitstream output
+    asn1_bitstream* gbstream = PoseInfuse->data(self);
+    if(!gbstream)
+    {
+        printf("Error getting port bstream at initialization !\n");
+		return rmp440_pause_init_main;
+    }
+    
+    // Init bitstream header
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
+    gbstream->header.seq = 0;
+    gbstream->header.stamp.sec = timeNow / 1000000;
+    gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
+    gbstream->header.frame_id = (char*)malloc(sizeof(char)*(1 + strlen("RoverBodyFrame")));
+    sprintf(gbstream->header.frame_id, "RoverBodyFrame");
+   
+    //// Init bistream type
+    gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
+    sprintf(gbstream->type, "Pose_InFuse");
+    gbstream->serialization_method = 0; //uPER
+    //reserve memory for serialized data 
+    //genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    //gbstream->data._length = 0;
+
+    //gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    //gbstream->data._length = 0;
+    //gbstream->data._release = NULL;
+    //gbstream->data._buffer = malloc(sizeof(uint8_t)*Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    ////////////////////////////////////////////////////////////////////////////////////
+
+    printf("Bitstream init ok\n");
+
 	return rmp440_ether;
 }
 

@@ -85,7 +85,7 @@ component rmp440 {
   task MotionTask {
     period sec_period s;
     stack 65536;
-    codel <start>initOdoAndAsserv(out ::ids, out PoseInfuse, out StatusGeneric) 
+    codel <start>initOdoAndAsserv(out ::ids, out StatusGeneric) 
       yield ether, odo;
     codel <odo>odoAndAsserv(in rmp,
 			    in kinematics,
@@ -128,7 +128,8 @@ component rmp440 {
 				    out rs_data,
 				    out rs_mode,
 				    out dynamics,
-				    out kinematics)
+				    out kinematics,
+                    out PoseInfuse)
       yield pause::init_main, ether;
     throw already_initialized, malloc_error, rmplib_error;
     task MotionTask;
