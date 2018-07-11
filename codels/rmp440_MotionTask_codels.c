@@ -80,6 +80,7 @@ gyroUpdate(GYRO_DATA **gyroId, rmp440_gyro *gyro,
     }
 #endif
 		  gyro->gyroTheta = - gyro->gyroTheta;
+    //toASN1SCC(string("LocalTerrainFrame"),asnPose.parentFrameId);
 		  gyro->gyroOmega = - gyro->gyroOmega;
 		}
 	}
@@ -208,11 +209,24 @@ initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
     ////////////////////////////////////////////////////////////////////////////////////
     //preparing bitstream output
     asn1_bitstream* gbstream = PoseInfuse->data(self);
-    genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
-    gbstream->data._length = 0;
+    
+    // Init bitstream header
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
+    gbstream->header.seq = 0;
+    gbstream->header.stamp.sec = timeNow / 1000000;
+    gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
+    gbstream->header.frame_id = (char*)malloc(sizeof(char)*(1 + strlen("RoverBodyFrame")));
+    sprintf(gbstream->header.frame_id, "RoverBodyFrame");
+   
+    // Init bistream type
     gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
     sprintf(gbstream->type, "Pose_InFuse");
     gbstream->serialization_method = 0; //uPER
+    //reserve memory for serialized data 
+    genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    gbstream->data._length = 0;
 
     //gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
     //gbstream->data._length = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
@@ -433,6 +447,8 @@ odoAndAsserv(const rmp440_io *rmp,
         printf("error, Pose_Infuse encoding error : %d\n", errorCode);
 	    return rmp440_pause_odo;
     }
+    //Set encoded size in bistream
+    gbstream->data._length = bstream.count;
 
     PoseInfuse->write(self);
     /////////////////// Infuse : end
