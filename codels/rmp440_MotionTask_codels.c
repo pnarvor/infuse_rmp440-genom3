@@ -403,12 +403,12 @@ odoAndAsserv(const rmp440_io *rmp,
     asnPose.msgVersion = pose_InFuse_Version;
 
     strcpy(asnPose.parentFrameId.arr, "LocalTerrainFrame");
-    asnPose.parentFrameId.nCount = strlen(asnPose.parentFrameId.arr);
+    asnPose.parentFrameId.nCount = strlen(asnPose.parentFrameId.arr) + 1;
     asnPose.parentTime.microseconds  = timeNow;
     asnPose.parentTime.usecPerSec = 1000000;
 
     strcpy(asnPose.childFrameId.arr, "RoverBodyFrame");
-    asnPose.childFrameId.nCount = strlen(asnPose.childFrameId.arr);
+    asnPose.childFrameId.nCount = strlen(asnPose.childFrameId.arr) + 1;
     asnPose.childTime.microseconds  = timeNow;
     asnPose.childTime.usecPerSec = 1000000;
     
