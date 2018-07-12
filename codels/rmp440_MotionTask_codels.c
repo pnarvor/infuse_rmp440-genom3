@@ -44,6 +44,10 @@
 #include "codels.h"
 #include "rmp440_Log.h"
 
+////////////////////////////////////////////////////////////////////////////////
+#include <sys/time.h>
+////////////////////////////////////////////////////////////////////////////////
+
 
 /* --- Task MotionTask -------------------------------------------------- */
 
@@ -214,6 +218,9 @@ odoAndAsserv(const rmp440_io *rmp,
              const rmp440_StatusGeneric *StatusGeneric,
              const genom_context self)
 {
+    static int count = 0;
+    printf("Count : %d\r", count);
+    printf("test\n");
 	rmp440_feedback *data = *rs_data;
 	double direction;
 	rmp440_status_str *status = Status->data(self);
@@ -608,4 +615,31 @@ rmp440GyroExec(const rmp440_gyro_params *params,
 	/* Finally set gyro mode */
 	gyro->currentMode = params->mode;
 	return rmp440_ether;
+}
+
+
+/* --- Activity GyroBiasUpdate ------------------------------------------ */
+
+/** Codel rmp440GyroBiasUpdate of activity GyroBiasUpdate.
+ *
+ * Triggered by rmp440_start.
+ * Yields to rmp440_ether.
+ * Throws rmp440_emergency_stop, rmp440_gyro_error.
+ */
+genom_event
+rmp440GyroBiasUpdate(int32_t nbMeasures,
+                     const or_genpos_cart_state *robot,
+                     rmp440_gyro *gyro, GYRO_DATA **gyroId,
+                     const genom_context self)
+{
+    if(gyro->currentMode == rmp440_gyro_off || *gyroId == NULL)
+    {
+        printf("Error gyroBiasEstimate : gyro must be initialized\n");
+        return rmp440_gyro_error(self);
+    }
+
+	if (gyroUpdateWOffset(*gyroId, nbMeasures) != 0)
+        return rmp440_gyro_error(self);
+
+    return rmp440_ether;
 }

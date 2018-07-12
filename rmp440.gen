@@ -182,6 +182,17 @@ component rmp440 {
     throw gyro_error;
     interrupts Gyro;
   };
+  
+  activity GyroBiasUpdate(in long nbMeasures) {
+    doc "Gyro bias estimation";
+    task MotionTask;
+    codel <start>rmp440GyroBiasUpdate(in nbMeasures,
+				in robot,
+				inout gyro,
+				inout gyroId) yield ether;
+    throw gyro_error;
+    interrupts GyroBiasUpdate;
+  };
 
   /*----------------------------------------------------------------------*/
   /* Log */
