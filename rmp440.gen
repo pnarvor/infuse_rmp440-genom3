@@ -129,7 +129,8 @@ component rmp440 {
 				    out rs_mode,
 				    out dynamics,
 				    out kinematics,
-                    out PoseInfuse)
+                    out PoseInfuse,
+                    in robot)
       yield pause::init_main, ether;
     throw already_initialized, malloc_error, rmplib_error;
     task MotionTask;
