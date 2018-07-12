@@ -218,9 +218,6 @@ odoAndAsserv(const rmp440_io *rmp,
              const rmp440_StatusGeneric *StatusGeneric,
              const genom_context self)
 {
-    static int count = 0;
-    printf("Count : %d\r", count);
-    printf("test\n");
 	rmp440_feedback *data = *rs_data;
 	double direction;
 	rmp440_status_str *status = Status->data(self);
