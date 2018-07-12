@@ -46,6 +46,35 @@ trackControl(const rmp440_io *rmp, const rmp440_feedback *rs_data,
 }
 
 
+/* --- Function toggleInfuseTrackMode ----------------------------------- */
+
+/** Codel toggleInfuseTrackMode of function toggleInfuseTrackMode.
+ *
+ * Returns genom_ok.
+ */
+genom_event
+toggleInfuseTrackMode(rmp440_mode rs_mode, uint8_t *infuseTrackMode,
+                      const genom_context self)
+{
+    if(*infuseTrackMode)
+    {
+        if(rs_mode == rmp440_mode_track)
+        {
+            printf("Error, rmp440 is in track activity. Deactivate track activity before toggling track mode.\nIgnoring command.");;
+            return genom_ok;
+        }
+        *infuseTrackMode = 0;
+        printf("Using idl track mode : cmd_vel\n");
+    }
+    else
+    {
+        *infuseTrackMode = 1;
+        printf("Using infuse track mode : cmd_vel_Infuse\n");
+    }
+    return genom_ok;
+}
+
+
 /* --- Function log ----------------------------------------------------- */
 
 /** Codel log_start of function log.

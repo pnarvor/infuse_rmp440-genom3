@@ -50,6 +50,7 @@ component rmp440 {
   exception sys_error;
 
   port in or::genpos::cart_speed cmd_vel;
+  port in asn1::bitstream cmd_vel_Infuse;
   port in or_joystick::state Joystick;
   port out or_pose_estimator::state Pose;
   port out asn1::bitstream PoseInfuse;
@@ -76,6 +77,7 @@ component rmp440 {
     gyro_asserv gyro_asserv;
     max_accel max_accel;
     log_str log;
+    octet infuseTrackMode;
   };
 
   attribute set_var_params(in var_params);
@@ -85,7 +87,9 @@ component rmp440 {
   task MotionTask {
     period sec_period s;
     stack 65536;
-    codel <start>initOdoAndAsserv(out ::ids, out PoseInfuse, out StatusGeneric)
+    codel <start>initOdoAndAsserv(out ::ids, out PoseInfuse,
+                out infuseTrackMode,
+                out StatusGeneric)
       yield ether, odo;
     codel <odo>odoAndAsserv(in rmp,
 			    in kinematics,
@@ -157,10 +161,14 @@ component rmp440 {
     doc  "Start tracking a reference port";
     validate trackControl(in rmp, in rs_data);
     codel <start>trackStart(inout rs_mode,
-			    port in cmd_vel) yield track_main, end;
+			    port in cmd_vel,
+                port in cmd_vel_Infuse,
+                in infuseTrackMode) yield track_main, end;
     codel <track_main>pumpReference(in robot,
 			      in rs_mode,
 			      port in cmd_vel,
+                  port in cmd_vel_Infuse,
+                  in infuseTrackMode,
 			      out ref) yield pause::track_main, end;
     codel <end>smoothStopTrack(in robot,
 			       in dynamics,
@@ -170,6 +178,11 @@ component rmp440 {
     throw not_connected, port_not_found, bad_ref, cmd_stop_track,
       motors_off, emergency_stop, power_cord_connected;
     interrupts JoystickOn, Track;
+  };
+  
+  function toggleInfuseTrackMode() {
+      doc "Overrides cmd_vel with cmd_vel_Infuse";
+      codel toggleInfuseTrackMode(in rs_mode, out infuseTrackMode);
   };
 
   function Stop() {

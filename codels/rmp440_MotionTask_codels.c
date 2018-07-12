@@ -146,6 +146,7 @@ yawToQuaternion(double yaw, or_t3d_pos *pos)
  */
 genom_event
 initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
+                 uint8_t *infuseTrackMode,
                  const rmp440_StatusGeneric *StatusGeneric,
                  const genom_context self)
 {
@@ -226,6 +227,8 @@ initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
     //reserve memory for serialized data 
     genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
     gbstream->data._length = 0;
+
+    *infuseTrackMode = 0;
     ////////////////////////////////////////////////////////////////////////////////////
 
 	return rmp440_odo;
