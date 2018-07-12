@@ -85,7 +85,7 @@ component rmp440 {
   task MotionTask {
     period sec_period s;
     stack 65536;
-    codel <start>initOdoAndAsserv(out ::ids, out StatusGeneric) 
+    codel <start>initOdoAndAsserv(out ::ids, out PoseInfuse, out StatusGeneric)
       yield ether, odo;
     codel <odo>odoAndAsserv(in rmp,
 			    in kinematics,
@@ -110,6 +110,7 @@ component rmp440 {
     throw emergency_stop;
   };
 
+
   task TrackTask {
     period sec_period s;
     stack 8192;
@@ -117,7 +118,7 @@ component rmp440 {
 
   /*----------------------------------------------------------------------*/
 
-  activity Init(in string<32> device = 
+  activity Init(in string<32> device =
 		"10.40.40.40:8080": "robot device specification") {
     doc "Connect to RMP440 robot";
     codel <start>rmp440InitStart(in device,
@@ -129,7 +130,6 @@ component rmp440 {
 				    out rs_mode,
 				    out dynamics,
 				    out kinematics,
-                    out PoseInfuse,
                     in robot)
       yield pause::init_main, ether;
     throw already_initialized, malloc_error, rmplib_error;
@@ -141,9 +141,9 @@ component rmp440 {
   activity JoystickOn() {
     doc "Activate joystick motion mode";
     task MotionTask;
-    codel <start>rmp440JoystickOnStart(in Joystick, inout rs_mode) 
+    codel <start>rmp440JoystickOnStart(in Joystick, inout rs_mode)
       yield js_main;
-    codel <js_main>rmp440JoystickOnMain(in Joystick, in rs_mode) 
+    codel <js_main>rmp440JoystickOnMain(in Joystick, in rs_mode)
       yield pause::js_main, inter;
     codel <inter>rmp440JoystickOnInter(out rs_mode, out ref) yield ether;
     throw bad_ref, rmplib_error, joystick_error, motors_off,

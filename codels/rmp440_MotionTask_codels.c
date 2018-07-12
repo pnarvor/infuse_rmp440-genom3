@@ -51,10 +51,6 @@
 #include <sys/time.h>
 ////////////////////////////////////////////////////////////////////////////////
 
-#define DEBUG 2
-
-#define DEBUG 2
-
 /* --- Task MotionTask -------------------------------------------------- */
 
 static void
@@ -149,7 +145,7 @@ yawToQuaternion(double yaw, or_t3d_pos *pos)
  * Throws rmp440_emergency_stop.
  */
 genom_event
-initOdoAndAsserv(rmp440_ids *ids,
+initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
                  const rmp440_StatusGeneric *StatusGeneric,
                  const genom_context self)
 {
@@ -205,44 +201,38 @@ initOdoAndAsserv(rmp440_ids *ids,
 	max_accel->prev_vel_command = 0.;
 	max_accel->prev_vel_command_t = -1.;
 
-    //////////////////////////////////////////////////////////////////////////////////////
-    ////preparing bitstream output
-    //asn1_bitstream* gbstream = PoseInfuse->data(self);
-    //if(!gbstream)
-    //{
-    //    printf("Error getting port bstream at initialization !\n");
-	//    return rmp440_start;
-    //}
-    //
-    //// Init bitstream header
-    //struct timeval tv;
-    //gettimeofday(&tv,NULL);
-    //long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
-    //gbstream->header.seq = 0;
-    //gbstream->header.stamp.sec = timeNow / 1000000;
-    //gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
-    //gbstream->header.frame_id = (char*)malloc(sizeof(char)*(1 + strlen("RoverBodyFrame")));
-    //sprintf(gbstream->header.frame_id, "RoverBodyFrame");
+    ////////////////////////////////////////////////////////////////////////////////////
+    //preparing bitstream output
+    asn1_bitstream* gbstream = PoseInfuse->data(self);
+    if(!gbstream)
+    {
+        printf("Error getting port bstream at initialization !\n");
+		return rmp440_pause_init_main;
+    }
+    
+    // Init bitstream header
+    struct timeval tv;
+    gettimeofday(&tv,NULL);
+    long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
+    gbstream->header.seq = 0;
+    gbstream->header.stamp.sec = timeNow / 1000000;
+    gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
+    gbstream->header.frame_id = (char*)malloc(sizeof(char)*(1 + strlen("RoverBodyFrame")));
+    sprintf(gbstream->header.frame_id, "RoverBodyFrame");
    
     //// Init bistream type
-    //gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
-    //sprintf(gbstream->type, "Pose_InFuse");
-    //gbstream->serialization_method = 0; //uPER
-    ////reserve memory for serialized data 
-    //genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
-    //gbstream->data._length = 0;
-
-    ////gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
-    ////gbstream->data._length = 0;
-    ////gbstream->data._release = NULL;
-    ////gbstream->data._buffer = malloc(sizeof(uint8_t)*Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
-    //////////////////////////////////////////////////////////////////////////////////////
-
-    ////printf("init ok\n");
+    gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
+    sprintf(gbstream->type, "Pose_InFuse");
+    gbstream->serialization_method = 0; //uPER
+    //reserve memory for serialized data 
+    genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    gbstream->data._length = 0;
+    ////////////////////////////////////////////////////////////////////////////////////
 
 	return rmp440_odo;
 }
 
+/*----------------------------------------------------------------------*/
 
 /** Codel odoAndAsserv of task MotionTask.
  *
@@ -460,7 +450,6 @@ odoAndAsserv(const rmp440_io *rmp,
         printf("error, Pose_Infuse encoding error : %d\n", errorCode);
 	    return rmp440_pause_odo;
     }
-    printf("Count : %d/%d\n", bstream.count, Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
     //Set encoded size in bistream
     gbstream->data._length = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
     gbstream->data._length = bstream.count;
@@ -549,6 +538,7 @@ rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
 
 /** Codel rmp440InitMain of activity Init.
  *
+
  * Triggered by rmp440_init_main.
  * Yields to rmp440_pause_init_main, rmp440_ether.
  * Throws rmp440_emergency_stop, rmp440_already_initialized,
@@ -558,7 +548,6 @@ genom_event
 rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
                rmp440_mode *rs_mode, rmp440_dynamic_str *dynamics,
                rmp440_kinematics_str *kinematics,
-               const rmp440_PoseInfuse *PoseInfuse,
                const or_genpos_cart_state *robot,
                const genom_context self)
 {
@@ -611,42 +600,33 @@ rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
 		    data->fram_accel_limit, data->fram_decel_limit);
 	rmp440CmdNone(*rmp);
     
-    ////////////////////////////////////////////////////////////////////////////////////
-    //preparing bitstream output
-    asn1_bitstream* gbstream = PoseInfuse->data(self);
-    if(!gbstream)
-    {
-        printf("Error getting port bstream at initialization !\n");
-		return rmp440_pause_init_main;
-    }
-    
-    // Init bitstream header
-    struct timeval tv;
-    gettimeofday(&tv,NULL);
-    long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
-    gbstream->header.seq = 0;
-    gbstream->header.stamp.sec = timeNow / 1000000;
-    gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
-    gbstream->header.frame_id = (char*)malloc(sizeof(char)*(1 + strlen("RoverBodyFrame")));
-    sprintf(gbstream->header.frame_id, "RoverBodyFrame");
+    //////////////////////////////////////////////////////////////////////////////////////
+    ////preparing bitstream output
+    //asn1_bitstream* gbstream = PoseInfuse->data(self);
+    //if(!gbstream)
+    //{
+    //    printf("Error getting port bstream at initialization !\n");
+	//	return rmp440_pause_init_main;
+    //}
+    //
+    //// Init bitstream header
+    //struct timeval tv;
+    //gettimeofday(&tv,NULL);
+    //long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
+    //gbstream->header.seq = 0;
+    //gbstream->header.stamp.sec = timeNow / 1000000;
+    //gbstream->header.stamp.nsec = (timeNow % 1000000) * 1000;
+    //gbstream->header.frame_id = (char*)malloc(sizeof(char)*(1 + strlen("RoverBodyFrame")));
+    //sprintf(gbstream->header.frame_id, "RoverBodyFrame");
    
-    //// Init bistream type
-    gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
-    sprintf(gbstream->type, "Pose_InFuse");
-    gbstream->serialization_method = 0; //uPER
-    //reserve memory for serialized data 
-    printf("Robot before : %f\n", robot->theta);
-    genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
-    gbstream->data._length = 0;
-    printf("Robot after  : %f\n", robot->theta);
-
-    //gbstream->data._maximum = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    ////// Init bistream type
+    //gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
+    //sprintf(gbstream->type, "Pose_InFuse");
+    //gbstream->serialization_method = 0; //uPER
+    ////reserve memory for serialized data 
+    //genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
     //gbstream->data._length = 0;
-    //gbstream->data._release = NULL;
-    //gbstream->data._buffer = malloc(sizeof(uint8_t)*Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
-    ////////////////////////////////////////////////////////////////////////////////////
-
-    printf("Bitstream init ok\n");
+    //////////////////////////////////////////////////////////////////////////////////////
 
 	return rmp440_ether;
 }
@@ -778,7 +758,9 @@ rmp440GyroExec(const rmp440_gyro_params *params,
 	} else
 		gyro->gyroTheta = - gyro->gyroTheta;
 	/* reset gyro offset to match odo */
+    /////////////////////////////////////////////////////////////////
     printf("Robot theta : %d\n", robot->theta);
+    //////////////////////////////////////////////////////////////
 	gyro->gyroToRobotOffset = robot->theta - gyro->gyroTheta;
 
 	/* Finally set gyro mode */
