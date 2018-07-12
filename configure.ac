@@ -10,7 +10,7 @@ AM_INIT_AUTOMAKE([foreign no-define])
 
 dnl Compilers
 dnl
-LT_INIT
+LT_INIT([disable-static])
 AC_PROG_CC
 
 
@@ -29,6 +29,8 @@ dnl --with-templates option
 AG_OPT_TEMPLATES([$GENOM3 ],
     [$srcdir/rmp440.gen])
 
+dnl Doc
+AM_MISSING_PROG([ASCIIDOCTOR], [asciidoctor])
 
 dnl Output
 AC_CONFIG_FILES([

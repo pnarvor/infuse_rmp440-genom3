@@ -136,7 +136,7 @@ yawToQuaternion(double yaw, or_t3d_pos *pos)
 genom_event
 initOdoAndAsserv(rmp440_ids *ids,
                  const rmp440_StatusGeneric *StatusGeneric,
-                 genom_context self)
+                 const genom_context self)
 {
 	rmp_status_str *statusgen = StatusGeneric->data(self);
 	rmp440_kinematics_str *kinematics = &ids->kinematics;
@@ -212,7 +212,7 @@ odoAndAsserv(const rmp440_io *rmp,
              rmp440_gyro_asserv *gyro_asserv, const rmp440_Pose *Pose,
              const rmp440_Status *Status,
              const rmp440_StatusGeneric *StatusGeneric,
-             genom_context self)
+             const genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
 	double direction;
@@ -345,7 +345,7 @@ odoAndAsserv(const rmp440_io *rmp,
  */
 genom_event
 endOdoAndAsserv(rmp440_io **rmp, rmp440_feedback **rs_data,
-                genom_context self)
+                const genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
 
@@ -373,7 +373,7 @@ endOdoAndAsserv(rmp440_io **rmp, rmp440_feedback **rs_data,
  */
 genom_event
 rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
-                rmp440_feedback **rs_data, genom_context self)
+                rmp440_feedback **rs_data, const genom_context self)
 {
 	/* error if already connected */
 	if (*rmp != NULL || *rs_data != NULL)
@@ -421,7 +421,8 @@ rmp440InitStart(const char device[32], rmp440_io **rmp, FE_STR **fe,
 genom_event
 rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
                rmp440_mode *rs_mode, rmp440_dynamic_str *dynamics,
-               rmp440_kinematics_str *kinematics, genom_context self)
+               rmp440_kinematics_str *kinematics,
+               const genom_context self)
 {
 	rmp440_feedback *data = *rs_data;
 	static int count = 0;
@@ -488,7 +489,7 @@ rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
  */
 genom_event
 rmp440JoystickOnStart(const rmp440_Joystick *Joystick,
-                      rmp440_mode *rs_mode, genom_context self)
+                      rmp440_mode *rs_mode, const genom_context self)
 {
 	struct or_joystick_state *joy;
 
@@ -517,7 +518,7 @@ rmp440JoystickOnStart(const rmp440_Joystick *Joystick,
  */
 genom_event
 rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
-                     rmp440_mode rs_mode, genom_context self)
+                     rmp440_mode rs_mode, const genom_context self)
 {
 	struct or_joystick_state *joy;
 
@@ -561,7 +562,7 @@ rmp440JoystickOnMain(const rmp440_Joystick *Joystick,
  */
 genom_event
 rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_speed *ref,
-                      genom_context self)
+                      const genom_context self)
 {
 
 	printf("%s\n", __func__);
@@ -581,7 +582,7 @@ rmp440JoystickOnInter(rmp440_mode *rs_mode, or_genpos_cart_speed *ref,
 genom_event
 rmp440GyroExec(const rmp440_gyro_params *params,
                const or_genpos_cart_state *robot, rmp440_gyro *gyro,
-               GYRO_DATA **gyroId, genom_context self)
+               GYRO_DATA **gyroId, const genom_context self)
 {
 
 	if (*gyroId == NULL) {

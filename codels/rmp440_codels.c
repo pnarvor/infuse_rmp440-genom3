@@ -37,7 +37,7 @@
  */
 genom_event
 trackControl(const rmp440_io *rmp, const rmp440_feedback *rs_data,
-             genom_context self)
+             const genom_context self)
 {
 	if (rmp == NULL)
 		return rmp440_not_connected(self);
@@ -55,7 +55,7 @@ trackControl(const rmp440_io *rmp, const rmp440_feedback *rs_data,
  */
 genom_event
 log_start(const char path[64], rmp440_log_str **log,
-          genom_context self)
+          const genom_context self)
 {
 	FILE *f;
 
@@ -86,7 +86,7 @@ log_start(const char path[64], rmp440_log_str **log,
  * Returns genom_ok.
  */
 genom_event
-log_stop(rmp440_log_str **log, genom_context self)
+log_stop(rmp440_log_str **log, const genom_context self)
 {
 	if (*log == NULL)
 		return genom_ok;
