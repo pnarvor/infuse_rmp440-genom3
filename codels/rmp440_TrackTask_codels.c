@@ -30,7 +30,7 @@
 #define RMP440_VMAX 1.0
 #define RMP440_WMAX 1.1
 #define RMP440_ACCEL_LIN_MAX 2.0
-#define RMP440_ACCEL_LIN_MAX 3.0
+#define RMP440_ACCEL_ANG_MAX 3.0
 
 /* --- Task TrackTask --------------------------------------------------- */
 
@@ -88,7 +88,7 @@ pumpSpeedReferenceInfuse(const or_genpos_cart_state *robot,
 	ref->vmax = RMP440_VMAX;
 	ref->wmax = RMP440_WMAX;
 	ref->linAccelMax = RMP440_ACCEL_LIN_MAX;
-	ref->angAccelMax = RMP440_ACCEL_LIN_MAX;
+	ref->angAccelMax = RMP440_ACCEL_ANG_MAX;
 
 	return rmp440_pause_track_main;
 }
