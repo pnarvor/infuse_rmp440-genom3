@@ -60,7 +60,6 @@ pumpSpeedReferenceInfuse(const or_genpos_cart_state *robot,
     {
         printf("Error decoding Twist_InFuse in %s, code : %d\n", __func__, errorCode);
 		return rmp440_pause_track_main;
-
     }
     
     if(asnTwist.twist.vel.arr[0] > RMP440_VMAX)
@@ -77,7 +76,7 @@ pumpSpeedReferenceInfuse(const or_genpos_cart_state *robot,
     if(asnTwist.twist.rot.arr[2] > RMP440_WMAX)
     {
         printf("Warning angular velocity : asked %frad/s, max is %frad/s\n",
-            asnTwist.twist.rot.arr[0], RMP440_WMAX);
+            asnTwist.twist.rot.arr[2], RMP440_WMAX);
 	    ref->w = RMP440_WMAX;
     }
     else
@@ -188,7 +187,7 @@ pumpReference(const or_genpos_cart_state *robot, rmp440_mode rs_mode,
     else
     {
         if(infuseTrackMode)
-		    return pumpSpeedReference(robot, cmd_vel_Infuse, ref, self);
+		    return pumpSpeedReferenceInfuse(robot, cmd_vel_Infuse, ref, self);
         else
 		    return pumpSpeedReference(robot, cmd_vel, ref, self);
     }
