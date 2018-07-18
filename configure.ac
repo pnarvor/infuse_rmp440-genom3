@@ -21,7 +21,7 @@ PKG_CHECK_MODULES(requires, [
   gyro-libs >= 3.0.99.0
   openrobots-idl >= 1.1
   infuse_types-genom3 >= 0.1
-  rmp440-libs >= 0.5, gyro-libs, felib, cdff_types
+  rmp440-libs >= 0.5, gyro-libs, felib, MTI-clients, cdff_types
 ])
 
 AC_PATH_PROG(GENOM3, [genom3], AC_MSG_ERROR([genom3 tool not found], 2))

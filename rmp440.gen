@@ -33,7 +33,7 @@ component rmp440 {
   version "0.1.99";
   email "openrobots@laas.fr";
   lang "c";
-  codels-require "rmp440-libs >= 0.5, gyro-libs, felib, cdff_types";
+  codels-require "rmp440-libs >= 0.5, gyro-libs, felib, MTI-clients, cdff_types";
 
   exception already_initialized;
   exception not_connected;
@@ -223,7 +223,8 @@ component rmp440 {
     doc "Init and configure MTI sensor";
     task MotionTask;
     codel <start>rmp440MTIopen(in params,
-				inout mtiHandle) yield ether;
+				inout mtiHandle,
+                inout mti) yield ether;
     throw mti_error;
     interrupts InitMTI;
   };

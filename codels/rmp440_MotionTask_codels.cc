@@ -838,10 +838,16 @@ rmp440GyroBiasUpdate(int32_t nbMeasures,
  */
 genom_event
 rmp440MTIopen(const rmp440_mti_params *params, MTI_DATA **mtiHandle,
-              const genom_context self)
+              rmp440_mti *mti, const genom_context self)
 {
     if(mtiHandle == NULL)
         return rmp440_mti_error(self);
+
+    *mtiHandle = (MTI_DATA*)new MTI(params->port,(OutputMode)params->outputMode,(OutputFormat)params->outputFormat);
+    if(!*mtiHandle)
+        return rmp440_mti_error(self);
+
+    mti->currentMode = params->mode;
 
     return rmp440_ether;
 }

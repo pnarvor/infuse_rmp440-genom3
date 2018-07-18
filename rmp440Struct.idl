@@ -214,6 +214,8 @@ module rmp440 {
   struct mti_params {
     mti_mode mode;
     string port;
+    long outputMode;
+    long outputFormat;
   };
 
   struct mti_inertial_data {
