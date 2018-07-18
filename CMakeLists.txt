@@ -21,8 +21,8 @@ endforeach()
 
 # Install genom module inside build dir
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${NAME}_genom3.stamp
-	#COMMAND PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/pkgconfig:${CMAKE_BINARY_DIR}/genom_modules/lib/pkgconfig:$ENV{PKG_CONFIG_PATH} genom3 skeleton -l c++ -i "${GENOM_FILE}"
-	COMMAND PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/pkgconfig:${CMAKE_BINARY_DIR}/genom_modules/lib/pkgconfig:$ENV{PKG_CONFIG_PATH} genom3 skeleton -l c -i "${GENOM_FILE}"
+	COMMAND PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/pkgconfig:${CMAKE_BINARY_DIR}/genom_modules/lib/pkgconfig:$ENV{PKG_CONFIG_PATH} genom3 skeleton -l c++ -i "${GENOM_FILE}"
+	#COMMAND PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/pkgconfig:${CMAKE_BINARY_DIR}/genom_modules/lib/pkgconfig:$ENV{PKG_CONFIG_PATH} genom3 skeleton -l c -i "${GENOM_FILE}"
 	COMMAND ./bootstrap.sh
 	COMMAND PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/pkgconfig:${CMAKE_BINARY_DIR}/genom_modules/lib/pkgconfig:$ENV{PKG_CONFIG_PATH} ./configure --prefix="${GENOM_INSTALL_PREFIX}" --with-templates=ros/server,ros/client/ros,ros/client/c
 	COMMAND make ${GENOM_NUM_JOBS} install
