@@ -31,9 +31,11 @@
 #include <string.h>
 #include <time.h>
 
+extern "C" {
 #include <rmp440/rmp440.h>
 #include <fe/ftdi-emergency.h>
 #include <gyroLib/gyro.h>
+}
 
 #include <MTI-clients/MTI.h>
 
