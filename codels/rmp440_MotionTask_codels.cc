@@ -425,14 +425,14 @@ odoAndAsserv(const rmp440_io *rmp,
     asnPose.msgVersion = pose_InFuse_Version;
 
     //strcpy(asnPose.parentFrameId.arr, "LocalTerrainFrame");
-    sprintf(asnPose.parentFrameId.arr, "LocalTerrainFrame");
-    asnPose.parentFrameId.nCount = strlen(asnPose.parentFrameId.arr) + 1;
+    sprintf((char*)asnPose.parentFrameId.arr, "LocalTerrainFrame");
+    asnPose.parentFrameId.nCount = strlen((char*)asnPose.parentFrameId.arr) + 1;
     asnPose.parentTime.microseconds  = timeNow;
     asnPose.parentTime.usecPerSec = 1000000;
 
     //strcpy(asnPose.childFrameId.arr, "RoverBodyFrame");
-    sprintf(asnPose.childFrameId.arr, "RoverBodyFrame");
-    asnPose.childFrameId.nCount = strlen(asnPose.childFrameId.arr) + 1;
+    sprintf((char*)asnPose.childFrameId.arr, "RoverBodyFrame");
+    asnPose.childFrameId.nCount = strlen((char*)asnPose.childFrameId.arr) + 1;
     asnPose.childTime.microseconds  = timeNow;
     asnPose.childTime.usecPerSec = 1000000;
     
@@ -841,7 +841,7 @@ rmp440MTIopen(const rmp440_mti_params *params, MTI_DATA **mtiHandle,
               const genom_context self)
 {
     if(mtiHandle == NULL)
-        return rmp440_mti_error;
+        return rmp440_mti_error(self);
 
     return rmp440_ether;
 }

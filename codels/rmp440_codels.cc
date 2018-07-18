@@ -95,7 +95,7 @@ log_start(const char path[64], rmp440_log_str **log,
 		return rmp440_sys_error(self);
 	fprintf(f, rmp440_feedback_header "\n");
 
-	*log = malloc(sizeof(**log));
+	*log = (rmp440_log_str*)malloc(sizeof(**log));
 	if (*log == NULL) {
 		fclose(f);
 		unlink(path);

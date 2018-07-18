@@ -198,7 +198,7 @@ dmfsf_jmult2 (const double *m1, const double *m2, double *m_res,
 
 	if (m_res == m1 || m_res == m2)
 	{
-		temp = malloc((l1*c2 + l1*(l1+1)/2) * sizeof(double));
+		temp = (double*)malloc((l1*c2 + l1*(l1+1)/2) * sizeof(double));
 		if (temp == NULL) {
 			fprintf(stderr, "%s : Can't allocate memory for temp\n", __func__);
 			return -1;
@@ -210,7 +210,7 @@ dmfsf_jmult2 (const double *m1, const double *m2, double *m_res,
 	}
 	else
 	{
-		temp = malloc((l1 * c2) * sizeof(double));
+		temp = (double*)malloc((l1 * c2) * sizeof(double));
 		if (temp == NULL) {
 			fprintf(stderr, "%s : Can't allocate memory for temp\n", __func__);
 			return -1;
