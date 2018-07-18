@@ -35,6 +35,8 @@
 #include <fe/ftdi-emergency.h>
 #include <gyroLib/gyro.h>
 
+#include <MTI-clients/MTI.h>
+
 #include "acrmp440.h"
 
 #include "rmp440_c_types.h"
@@ -230,6 +232,32 @@ initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
 
     *infuseTrackMode = 0;
     ////////////////////////////////////////////////////////////////////////////////////
+
+    ids->mtiHandle = NULL;
+
+    ids->mti.mtiOn = false; 
+    ids->mti.currentMode = rmp440_mti_off;
+    ids->mti.data.acc[0] = 0.0;
+    ids->mti.data.acc[1] = 0.0;
+    ids->mti.data.acc[2] = 0.0;
+
+    ids->mti.data.gyr[0] = 0.0;
+    ids->mti.data.gyr[1] = 0.0;
+    ids->mti.data.gyr[2] = 0.0;
+
+    ids->mti.data.mag[0] = 0.0;
+    ids->mti.data.mag[1] = 0.0;
+    ids->mti.data.mag[2] = 0.0;
+
+    ids->mti.data.euler[0] = 0.0;
+    ids->mti.data.euler[1] = 0.0;
+    ids->mti.data.euler[2] = 0.0;
+
+    ids->mti.data.count = 0;
+    
+    ids->mti.data.timeStampRaw       = 0.0;
+    ids->mti.data.timeStampUndelayed = 0.0;
+    ids->mti.data.timeStampFiltered  = 0.0;
 
 	return rmp440_odo;
 }
@@ -793,6 +821,25 @@ rmp440GyroBiasUpdate(int32_t nbMeasures,
 
 	if (gyroUpdateWOffset(*gyroId, nbMeasures) != 0)
         return rmp440_gyro_error(self);
+
+    return rmp440_ether;
+}
+
+
+/* --- Activity InitMTI ------------------------------------------------- */
+
+/** Codel rmp440MTIopen of activity InitMTI.
+ *
+ * Triggered by rmp440_start.
+ * Yields to rmp440_ether.
+ * Throws rmp440_emergency_stop, rmp440_mti_error.
+ */
+genom_event
+rmp440MTIopen(const rmp440_mti_params *params, MTI_DATA **mtiHandle,
+              const genom_context self)
+{
+    if(mtiHandle == NULL)
+        return rmp440_mti_error;
 
     return rmp440_ether;
 }

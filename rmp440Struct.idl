@@ -29,6 +29,7 @@ native rmp440_io;
 native rmp440_feedback;
 native FE_STR;
 native GYRO_DATA;
+native MTI_DATA;
 
 module rmp440 {
 
@@ -201,6 +202,35 @@ module rmp440 {
     double prev_t;
     double integral_s;
     double jump_t; // last jump time
+  };
+
+  /* MTI */
+  enum mti_mode {
+    mti_off,
+    mti_on_if_motion,
+    mti_on
+  };
+
+  struct mti_params {
+    mti_mode mode;
+    string port;
+  };
+
+  struct mti_inertial_data {
+    float acc[3];
+    float gyr[3];
+    float mag[3];
+    float euler[3];
+    long count;
+    double timeStampRaw;
+    double timeStampUndelayed;
+    double timeStampFiltered;
+  };
+  
+  struct mti {
+    boolean mtiOn;
+    mti_mode currentMode;
+    mti_inertial_data data;
   };
 
   /* Acceleration limitation code */

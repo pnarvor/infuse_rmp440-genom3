@@ -42,6 +42,7 @@ component rmp440 {
   exception rmplib_error;
   exception joystick_error;
   exception gyro_error;
+  exception mti_error;
   exception motors_off;
   exception emergency_stop;
   exception power_cord_connected;
@@ -75,6 +76,8 @@ component rmp440 {
     GYRO_DATA gyroId;
     gyro gyro;
     gyro_asserv gyro_asserv;
+    MTI_DATA mtiHandle;
+    mti mti;
     max_accel max_accel;
     log_str log;
     octet infuseTrackMode;
@@ -214,6 +217,17 @@ component rmp440 {
     interrupts GyroBiasUpdate;
   };
 
+  /*----------------------------------------------------------------------*/
+
+  activity InitMTI(in mti_params params) {
+    doc "Init and configure MTI sensor";
+    task MotionTask;
+    codel <start>rmp440MTIopen(in params,
+				inout mtiHandle) yield ether;
+    throw mti_error;
+    interrupts InitMTI;
+  };
+  
   /*----------------------------------------------------------------------*/
   /* Log */
   function log(in string<64> path = "/tmp/rmp440.log": "Log file name") {
