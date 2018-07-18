@@ -1,14 +1,14 @@
 lib_LTLIBRARIES = librmp440_codels.la
 
 librmp440_codels_la_SOURCES=	rmp440_c_types.h
-librmp440_codels_la_SOURCES+=	rmp440_codels.c
-librmp440_codels_la_SOURCES+=	rmp440_MotionTask_codels.c
-librmp440_codels_la_SOURCES+=	rmp440_TrackTask_codels.c
+librmp440_codels_la_SOURCES+=	rmp440_codels.cc
+librmp440_codels_la_SOURCES+=	rmp440_MotionTask_codels.cc
+librmp440_codels_la_SOURCES+=	rmp440_TrackTask_codels.cc
 
-librmp440_codels_la_SOURCES+=	codels.h joystick.c motion_helpers.c \
-				odoProba.c odoProba.h orMathLib.h
+librmp440_codels_la_SOURCES+=	codels.h joystick.cc motion_helpers.cc \
+				odoProba.cc odoProba.h orMathLib.h
 
-librmp440_codels_la_SOURCES+=	rmp440_Log.c rmp440_Log.h
+librmp440_codels_la_SOURCES+=	rmp440_Log.cc rmp440_Log.h
 
 librmp440_codels_la_CPPFLAGS=	$(requires_CFLAGS)
 librmp440_codels_la_LDFLAGS=	$(requires_LIBS)
