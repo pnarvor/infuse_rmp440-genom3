@@ -25,7 +25,7 @@ distclean-local:
 merge: merge-interactive
 merge-%:
 	cd ${top_srcdir} && ${GENOM3}  \
-		skeleton -l 'c' -m $* rmp440.gen
+		skeleton -l 'c++' -m $* rmp440.gen
 
 # documentation
 dist_doc_DATA=	README.html README.adoc
