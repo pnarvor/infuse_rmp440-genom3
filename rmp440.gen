@@ -81,6 +81,7 @@ component rmp440 {
     mti mti;
     mti_config mtiConfig;
     odometry_mode odoMode;
+    or::genpos::cart_3dstate robot3d;
     max_accel max_accel;
     log_str log;
     octet infuseTrackMode;
@@ -115,6 +116,7 @@ component rmp440 {
                 out mtiHandle,
                 out mti,
                 in odoMode,
+                inout robot3d,
 			    out Pose,
                 out PoseInfuse,
 			    out Status,

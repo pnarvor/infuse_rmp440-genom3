@@ -158,6 +158,7 @@ initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
 	rmp_status_str *statusgen = StatusGeneric->data(self);
 	rmp440_kinematics_str *kinematics = &ids->kinematics;
 	or_genpos_cart_state *robot = &ids->robot;
+	or_genpos_cart_3dstate *robot3d = &ids->robot3d;
 	or_genpos_cart_speed *ref = &ids->ref;
 	rmp440_gyro *gyro = &ids->gyro;
 	rmp440_gyro_asserv *gyro_asserv = &ids->gyro_asserv;
@@ -264,6 +265,19 @@ initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
 
     ids->odoMode = rmp440_odometry_2d;
 
+	robot3d->xRef  = 0.;
+	robot3d->yRef  = 0.;
+	robot3d->zRef  = 0.;
+	robot3d->xRob  = 0.;
+	robot3d->yRob  = 0.;
+	robot3d->zRob  = 0.;
+	robot3d->roll  = 0.;
+	robot3d->pitch = 0.;
+	robot3d->theta = 0.;
+	robot3d->v     = 0.;
+	robot3d->vt    = 0.;
+	robot3d->w     = 0.;
+
 	return rmp440_odo;
 }
 
@@ -287,7 +301,7 @@ odoAndAsserv(const rmp440_io *rmp,
              rmp440_mode *rs_mode, rmp440_gyro *gyro,
              rmp440_gyro_asserv *gyro_asserv, MTI_DATA **mtiHandle,
              rmp440_mti *mti, rmp440_odometry_mode odoMode,
-             const rmp440_Pose *Pose,
+             or_genpos_cart_3dstate *robot3d, const rmp440_Pose *Pose,
              const rmp440_PoseInfuse *PoseInfuse,
              const rmp440_Status *Status,
              const rmp440_StatusGeneric *StatusGeneric,
@@ -334,11 +348,9 @@ odoAndAsserv(const rmp440_io *rmp,
   
     if(odoMode == rmp440_odometry_3d)
     {
-        //MTI* mtiHandleP = (MTI*)*mtiHandle;
-        //mtiHandleP->read((INERTIAL_DATA*)(&mti->data),false);
-        if(readMTI(mtiHandle, &mti->data))
+        if(rmp440odo3d(mtiHandle, mti, robot, robot3d, rmp440_sec_period))
         {
-            printf("acc  : %2.2f %2.2f %2.2f\ngyr  : %2.2f %2.2f %2.2f\nmag  : %2.2f %2.2f %2.2f\neuler: %2.2f %2.2f %2.2f\n\n",
+            printf("acc  : %2.2f %2.2f %2.2f\ngyr  : %2.2f %2.2f %2.2f\nmag  : %2.2f %2.2f %2.2f\neuler: %2.2f %2.2f %2.2f\nperiod: %2.2lf\n\n",
                 mti->data.acc[0], 
                 mti->data.acc[1], 
                 mti->data.acc[2], 
@@ -350,7 +362,8 @@ odoAndAsserv(const rmp440_io *rmp,
                 mti->data.mag[2],
                 mti->data.euler[0], 
                 mti->data.euler[1], 
-                mti->data.euler[2]);
+                mti->data.euler[2],
+                rmp440_sec_period);
             fflush(stdout);
         }
     }

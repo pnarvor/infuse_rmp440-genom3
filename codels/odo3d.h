@@ -2,7 +2,7 @@
 #define DEF_ODO3d_H
 
 extern bool readMTI(MTI_DATA** mtiHandle, rmp440_mti_inertial_data* data);
-extern genom_event rmp440Odo3d(MTI_DATA** mtiHandle, rmp440_mti* mti,
-    or_genpos_cart_state *robot);
+extern bool rmp440odo3d(MTI_DATA** mtiHandle, rmp440_mti* mti,
+    or_genpos_cart_state* robot, or_genpos_cart_3dstate* robot3d, double period);
 
 #endif
