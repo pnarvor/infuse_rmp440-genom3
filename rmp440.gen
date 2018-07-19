@@ -78,6 +78,7 @@ component rmp440 {
     gyro_asserv gyro_asserv;
     MTI_DATA mtiHandle;
     mti mti;
+    mti_config mtiConfig;
     max_accel max_accel;
     log_str log;
     octet infuseTrackMode;
@@ -224,7 +225,8 @@ component rmp440 {
     task MotionTask;
     codel <start>rmp440MTIopen(in params,
 				inout mtiHandle,
-                inout mti) yield ether;
+                inout mti,
+                inout mtiConfig) yield ether;
     throw mti_error;
     interrupts InitMTI;
   };

@@ -838,15 +838,74 @@ rmp440GyroBiasUpdate(int32_t nbMeasures,
  */
 genom_event
 rmp440MTIopen(const rmp440_mti_params *params, MTI_DATA **mtiHandle,
-              rmp440_mti *mti, const genom_context self)
+              rmp440_mti *mti, rmp440_mti_config *mtiConfig,
+              const genom_context self)
 {
+    MTI* mtiHandleP = (MTI*)*mtiHandle;
     if(mtiHandle == NULL)
         return rmp440_mti_error(self);
 
-    *mtiHandle = (MTI_DATA*)new MTI(params->port,(OutputMode)params->outputMode,(OutputFormat)params->outputFormat);
-    if(!*mtiHandle)
+    // Checking input parameters
+    switch(params->outputMode)
+    {
+        default:
+            printf("Error MTI open : invalid outputMode parameter. Candidates are:\n\
+                    MTI_OPMODE_CALIBRATED  = 2\n\
+                    MTI_OPMODE_ORIENTATION = 4\n\
+                    MTI_OPMODE_BOTH        = 6\n");
+            return rmp440_mti_error(self);
+            break;
+        case (int)MTI_OPMODE_CALIBRATED:
+            break;
+        case (int)MTI_OPMODE_ORIENTATION:
+            break;
+        case (int)MTI_OPMODE_BOTH:
+            break;
+    }
+    switch(params->outputFormat)
+    {
+        default:
+            printf("Error MTI open : invalid outputFormat parameter. Candidates are:\n\
+                    MTI_OPFORMAT_QUAT  = 0\n\
+                    MTI_OPFORMAT_EULER = 4\n\
+                    MTI_OPFORMAT_MAT   = 8\n");
+            return rmp440_mti_error(self);
+            break;
+        case (int)MTI_OPFORMAT_QUAT:
+            break;
+        case (int)MTI_OPFORMAT_EULER:
+            break;
+        case (int)MTI_OPFORMAT_MAT:
+            break;
+    }
+
+    // Config copied from MTIinitExec codel in robotpkg/localization/MTI
+    mtiConfig->outputMode           = (OutputMode)params->outputMode;
+    mtiConfig->outputFormat         = (OutputFormat)params->outputFormat;
+    mtiConfig->syncOutMode          = MTI_SYNCOUTMODE_DISABLED;
+    mtiConfig->syncOutPulsePolarity = MTI_SYNCOUTPULSE_POS;
+    mtiConfig->syncOutSkipFactor    = 0;
+    mtiConfig->syncOutOffset        = 0;
+    mtiConfig->syncOutPulseWidth    = 29498; //1ms pulse
+    
+    mtiHandleP = new MTI(params->port,
+        (OutputMode)mtiConfig->outputMode,
+        (OutputFormat)mtiConfig->outputFormat);
+    if(!mtiHandleP)
         return rmp440_mti_error(self);
 
+    if(!mtiHandleP->set_syncOut((SyncOutMode)mtiConfig->syncOutMode,
+        (SyncOutPulsePolarity)mtiConfig->syncOutPulsePolarity,
+        mtiConfig->syncOutSkipFactor,
+        mtiConfig->syncOutOffset,
+        mtiConfig->syncOutPulseWidth))
+    {
+        printf("Error MTI open : set_SyncOut failed\n");
+        delete mtiHandleP;
+        return rmp440_mti_error(self);
+    }
+    
+    *mtiHandle = (MTI_DATA*)mtiHandleP;
     mti->currentMode = params->mode;
 
     return rmp440_ether;

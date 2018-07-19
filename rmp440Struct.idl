@@ -211,6 +211,29 @@ module rmp440 {
     mti_on
   };
 
+  //enum mti_outputMode {
+  //  MTI_OUTPUT_MODE_CALIBRATED;
+  //  MTI_OUTPUT_MODE_ORIENTATION;
+  //  MTI_OUTPUT_MODE_BOTH;
+  //};
+
+  //enum mti_outputFormat {
+  //  MTI_OUTPUT_FORMAT_QUAT;
+  //  MTI_OUTPUT_FORMAT_EULER;
+  //  MTI_OUTPUT_FORMAT_MAT;
+  //};
+
+  //enum mti_syncOutMode {
+  //    MTI_SYNCOUT_MODE_DISABLED;
+  //    MTI_SYNCOUT_MODE_TOGGLE;
+  //    MTI_SYNCOUT_MODE_PULSE;
+  //};
+
+  //enum mti_syncOutPulsePolarity {
+  //    MTI_SYNCOUT_PULSE_NEG;
+  //    MTI_SYNCOUT_PULSE_POS;
+  //};
+
   struct mti_params {
     mti_mode mode;
     string port;
@@ -227,6 +250,16 @@ module rmp440 {
     double timeStampRaw;
     double timeStampUndelayed;
     double timeStampFiltered;
+  };
+
+  struct mti_config {
+      long outputMode;
+      long outputFormat;
+      long syncOutMode;
+      long syncOutPulsePolarity;
+      long syncOutSkipFactor;
+      long syncOutOffset;
+      long syncOutPulseWidth;
   };
   
   struct mti {
