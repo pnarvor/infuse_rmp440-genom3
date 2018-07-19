@@ -110,6 +110,8 @@ component rmp440 {
 			    out rs_mode,
 			    out gyro,
 			    out gyro_asserv,
+                out mtiHandle,
+                out mti,
 			    out Pose,
                 out PoseInfuse,
 			    out Status,

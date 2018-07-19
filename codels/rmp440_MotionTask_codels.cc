@@ -282,7 +282,8 @@ odoAndAsserv(const rmp440_io *rmp,
              or_genpos_cart_config_var *var, or_genpos_cart_speed *ref,
              rmp440_max_accel *max_accel, rmp440_feedback **rs_data,
              rmp440_mode *rs_mode, rmp440_gyro *gyro,
-             rmp440_gyro_asserv *gyro_asserv, const rmp440_Pose *Pose,
+             rmp440_gyro_asserv *gyro_asserv, MTI_DATA **mtiHandle,
+             rmp440_mti *mti, const rmp440_Pose *Pose,
              const rmp440_PoseInfuse *PoseInfuse,
              const rmp440_Status *Status,
              const rmp440_StatusGeneric *StatusGeneric,
@@ -324,10 +325,17 @@ odoAndAsserv(const rmp440_io *rmp,
 	    kinematics->axisWidth, var_params->coeffLinAng,
 	    rmp440_sec_period);	/* XXX could use the actual measured period */
 	gyroUpdate(gyroId, gyro, gyro_asserv, robot);
+
+    ////////////////////////////////////////////////////////////////////////
+    MTI* mtiHandleP = (MTI*)*mtiHandle;
+    mtiHandleP->read((INERTIAL_DATA*)(&mti->data),true);
+
 #ifdef notyet
 	if (odometryMode == RMP440_ODO_3D)
 		rmp440Odo3d(EXEC_TASK_PERIOD(RMP440_MOTIONTASK_NUM));
 #endif
+
+    ////////////////////////////////////////////////////////////////////////
 	/* fill pose */
 	pose->ts.sec = data->timestamp.tv_sec;
 	pose->ts.nsec = data->timestamp.tv_nsec;
