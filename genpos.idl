@@ -16,9 +16,13 @@ module or {
     struct cart_3dstate {
       double xRef;		/* position  */
       double yRef;		/* control point */
+      double zRef;
       double xRob;		/* position */
       double yRob;		/* robot center */
-      double theta;		/* robot orientation*/
+      double zRob;
+      double roll;
+      double pitch;
+      double theta;		/* robot orientation (yaw)*/
       double v;			/* longitudinal linear velocity */
       double vt;		/* linear velocity (transversal) */
       double w;			/* angular velocity */
