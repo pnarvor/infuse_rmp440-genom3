@@ -13,6 +13,17 @@ module or {
       double w;			/* angular velocity */
     };
 
+    struct cart_3dstate {
+      double xRef;		/* position  */
+      double yRef;		/* control point */
+      double xRob;		/* position */
+      double yRob;		/* robot center */
+      double theta;		/* robot orientation*/
+      double v;			/* longitudinal linear velocity */
+      double vt;		/* linear velocity (transversal) */
+      double w;			/* angular velocity */
+    };
+
     /* configuration of a cart-like mobile robot */
     struct cart_config {
       double x;

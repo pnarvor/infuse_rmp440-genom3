@@ -43,6 +43,7 @@ component rmp440 {
   exception joystick_error;
   exception gyro_error;
   exception mti_error;
+  exception odo3d_error;
   exception motors_off;
   exception emergency_stop;
   exception power_cord_connected;
@@ -79,6 +80,7 @@ component rmp440 {
     MTI_DATA mtiHandle;
     mti mti;
     mti_config mtiConfig;
+    odometry_mode odoMode;
     max_accel max_accel;
     log_str log;
     octet infuseTrackMode;
@@ -112,6 +114,7 @@ component rmp440 {
 			    out gyro_asserv,
                 out mtiHandle,
                 out mti,
+                in odoMode,
 			    out Pose,
                 out PoseInfuse,
 			    out Status,
@@ -230,7 +233,15 @@ component rmp440 {
                 inout mti,
                 inout mtiConfig) yield ether;
     throw mti_error;
-    interrupts InitMTI;
+  };
+
+  activity ToggleOdometryMode() {
+    doc "Enable or disable odometry mode";
+    task MotionTask;
+    codel <start>rmp440ToggleOdoMode(inout mtiHandle,
+                inout mti,
+                inout odoMode) yield ether;
+    throw odo3d_error;
   };
   
   /*----------------------------------------------------------------------*/

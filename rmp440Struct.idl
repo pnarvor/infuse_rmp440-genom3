@@ -245,7 +245,7 @@ module rmp440 {
     float acc[3];
     float gyr[3];
     float mag[3];
-    float euler[3];
+    float euler[3]; // convention is 0:roll, 1:pitch, 2:yaw
     long count;
     double timeStampRaw;
     double timeStampUndelayed;
@@ -266,6 +266,11 @@ module rmp440 {
     boolean mtiOn;
     mti_mode currentMode;
     mti_inertial_data data;
+  };
+
+  enum odometry_mode {
+    odometry_2d,
+    odometry_3d
   };
 
   /* Acceleration limitation code */

@@ -47,6 +47,7 @@ extern "C" {
 #include "odoProba.h"
 #include "codels.h"
 #include "rmp440_Log.h"
+#include "odo3d.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 #include <sys/time.h>
@@ -261,6 +262,8 @@ initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
     ids->mti.data.timeStampUndelayed = 0.0;
     ids->mti.data.timeStampFiltered  = 0.0;
 
+    ids->odoMode = rmp440_odometry_2d;
+
 	return rmp440_odo;
 }
 
@@ -283,7 +286,8 @@ odoAndAsserv(const rmp440_io *rmp,
              rmp440_max_accel *max_accel, rmp440_feedback **rs_data,
              rmp440_mode *rs_mode, rmp440_gyro *gyro,
              rmp440_gyro_asserv *gyro_asserv, MTI_DATA **mtiHandle,
-             rmp440_mti *mti, const rmp440_Pose *Pose,
+             rmp440_mti *mti, rmp440_odometry_mode odoMode,
+             const rmp440_Pose *Pose,
              const rmp440_PoseInfuse *PoseInfuse,
              const rmp440_Status *Status,
              const rmp440_StatusGeneric *StatusGeneric,
@@ -327,8 +331,29 @@ odoAndAsserv(const rmp440_io *rmp,
 	gyroUpdate(gyroId, gyro, gyro_asserv, robot);
 
     ////////////////////////////////////////////////////////////////////////
-    MTI* mtiHandleP = (MTI*)*mtiHandle;
-    mtiHandleP->read((INERTIAL_DATA*)(&mti->data),true);
+  
+    if(odoMode == rmp440_odometry_3d)
+    {
+        //MTI* mtiHandleP = (MTI*)*mtiHandle;
+        //mtiHandleP->read((INERTIAL_DATA*)(&mti->data),false);
+        if(readMTI(mtiHandle, &mti->data))
+        {
+            printf("acc  : %2.2f %2.2f %2.2f\ngyr  : %2.2f %2.2f %2.2f\nmag  : %2.2f %2.2f %2.2f\neuler: %2.2f %2.2f %2.2f\n\n",
+                mti->data.acc[0], 
+                mti->data.acc[1], 
+                mti->data.acc[2], 
+                mti->data.gyr[0], 
+                mti->data.gyr[1], 
+                mti->data.gyr[2], 
+                mti->data.mag[0], 
+                mti->data.mag[1], 
+                mti->data.mag[2],
+                mti->data.euler[0], 
+                mti->data.euler[1], 
+                mti->data.euler[2]);
+            fflush(stdout);
+        }
+    }
 
 #ifdef notyet
 	if (odometryMode == RMP440_ODO_3D)
@@ -918,3 +943,47 @@ rmp440MTIopen(const rmp440_mti_params *params, MTI_DATA **mtiHandle,
 
     return rmp440_ether;
 }
+
+
+/* --- Activity ToggleOdometryMode -------------------------------------- */
+
+/** Codel rmp440ToggleOdoMode of activity ToggleOdometryMode.
+ *
+ * Triggered by rmp440_start.
+ * Yields to rmp440_ether.
+ * Throws rmp440_emergency_stop, rmp440_odo3d_error.
+ */
+genom_event
+rmp440ToggleOdoMode(MTI_DATA **mtiHandle, rmp440_mti *mti,
+                    rmp440_odometry_mode *odoMode,
+                    const genom_context self)
+{
+    MTI* mtiHandleP;
+    if(*odoMode == rmp440_odometry_2d)
+    {
+        if(!mtiHandle)
+            return rmp440_odo3d_error(self);
+        mtiHandleP = (MTI*)*mtiHandle;
+        if(!mtiHandleP)
+        {
+            printf("Error toggleOdoMode, did you initialize the mti ?\n");
+            return rmp440_odo3d_error(self);
+        }
+        // read once to check if ok
+        if(!mtiHandleP->read((INERTIAL_DATA*)(&mti->data),false))
+            return rmp440_odo3d_error(self);
+
+        *odoMode = rmp440_odometry_3d;
+    }
+    else
+    {
+        //carefull with reinit...
+        *odoMode = rmp440_odometry_2d;
+    }
+    return rmp440_ether;
+}
+
+
+
+
+
