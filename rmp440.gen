@@ -115,7 +115,7 @@ component rmp440 {
 			    out gyro_asserv,
                 out mtiHandle,
                 out mti,
-                in odoMode,
+                inout odoMode,
                 inout robot3d,
 			    out Pose,
                 out PoseInfuse,

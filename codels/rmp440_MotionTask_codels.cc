@@ -141,6 +141,22 @@ yawToQuaternion(double yaw, or_t3d_pos *pos)
 	pos->qz = sin(yaw * 0.5);
 }
 
+static void
+eulerToQuaternion(double roll, double pitch, double yaw, or_t3d_pos *pos)
+{
+    double cy = cos(yaw * 0.5);
+	double sy = sin(yaw * 0.5);
+	double cr = cos(roll * 0.5);
+	double sr = sin(roll * 0.5);
+	double cp = cos(pitch * 0.5);
+	double sp = sin(pitch * 0.5);
+
+	pos->qw = cy * cr * cp + sy * sr * sp;
+	pos->qx = cy * sr * cp - sy * cr * sp;
+	pos->qy = cy * cr * sp + sy * sr * cp;
+	pos->qz = sy * cr * cp - cy * sr * sp;
+}
+
 /*----------------------------------------------------------------------*/
 
 /** Codel initOdoAndAsserv of task MotionTask.
@@ -300,7 +316,7 @@ odoAndAsserv(const rmp440_io *rmp,
              rmp440_max_accel *max_accel, rmp440_feedback **rs_data,
              rmp440_mode *rs_mode, rmp440_gyro *gyro,
              rmp440_gyro_asserv *gyro_asserv, MTI_DATA **mtiHandle,
-             rmp440_mti *mti, rmp440_odometry_mode odoMode,
+             rmp440_mti *mti, rmp440_odometry_mode *odoMode,
              or_genpos_cart_3dstate *robot3d, const rmp440_Pose *Pose,
              const rmp440_PoseInfuse *PoseInfuse,
              const rmp440_Status *Status,
@@ -346,9 +362,9 @@ odoAndAsserv(const rmp440_io *rmp,
 
     ////////////////////////////////////////////////////////////////////////
   
-    if(odoMode == rmp440_odometry_3d)
+    if(*odoMode == rmp440_odometry_3d)
     {
-        if(rmp440odo3d(mtiHandle, mti, robot, robot3d, rmp440_sec_period))
+        if(rmp440odo3d(mtiHandle, mti, robot, robot3d, odoMode, rmp440_sec_period))
         {
             printf("acc  : %2.2f %2.2f %2.2f\ngyr  : %2.2f %2.2f %2.2f\nmag  : %2.2f %2.2f %2.2f\neuler: %2.2f %2.2f %2.2f\nperiod: %2.2lf\n\n",
                 mti->data.acc[0], 
@@ -368,22 +384,34 @@ odoAndAsserv(const rmp440_io *rmp,
         }
     }
 
-#ifdef notyet
-	if (odometryMode == RMP440_ODO_3D)
-		rmp440Odo3d(EXEC_TASK_PERIOD(RMP440_MOTIONTASK_NUM));
-#endif
-
     ////////////////////////////////////////////////////////////////////////
-	/* fill pose */
+
+
+    /* fill pose */
 	pose->ts.sec = data->timestamp.tv_sec;
 	pose->ts.nsec = data->timestamp.tv_nsec;
 	pose->intrinsic = true;
 	pose->pos._present = true;
-	pose->pos._value.x = robot->xRob;
-	pose->pos._value.y = robot->yRob;
-	pose->pos._value.z = 0.0; 	/* XXX */
-	yawToQuaternion(robot->theta, &pose->pos._value); /* XXX */
-	pose->vel._present = true;
+
+    if(*odoMode != rmp440_odometry_3d)
+    {
+	    pose->pos._value.x = robot->xRob;
+	    pose->pos._value.y = robot->yRob;
+	    pose->pos._value.z = 0.0; 	/* XXX */
+	    yawToQuaternion(robot->theta, &pose->pos._value); /* XXX */
+    }
+    else
+    {
+	    pose->pos._value.x = robot3d->xRob;
+	    pose->pos._value.y = robot3d->yRob;
+	    pose->pos._value.z = robot3d->zRob;
+	    eulerToQuaternion(robot3d->roll,
+                            robot3d->pitch,
+                            robot3d->theta,
+                            &pose->pos._value);
+    }
+	
+    pose->vel._present = true;
 	pose->vel._value.vx = robot->v;
 	pose->vel._value.vy = 0;
 	pose->vel._value.vz = 0;
@@ -837,7 +865,7 @@ rmp440GyroExec(const rmp440_gyro_params *params,
 		gyro->gyroTheta = - gyro->gyroTheta;
 	/* reset gyro offset to match odo */
     /////////////////////////////////////////////////////////////////
-    printf("Robot theta : %d\n", robot->theta);
+    printf("Robot theta : %f\n", robot->theta);
     //////////////////////////////////////////////////////////////
 	gyro->gyroToRobotOffset = robot->theta - gyro->gyroTheta;
 
