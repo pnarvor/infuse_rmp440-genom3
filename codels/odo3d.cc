@@ -6,6 +6,7 @@ extern "C" {
 
 #include "acrmp440.h"
 #include "rmp440_c_types.h"
+#include "orMathLib.h"
 
 
 /* Odometry z correction */
@@ -31,7 +32,8 @@ bool readMTI(MTI_DATA** mtiHandle, rmp440_mti_inertial_data* data)
     if(!mtiHandleP)
         return false;
 
-    return mtiHandleP->read((INERTIAL_DATA*)data, false);
+    //return mtiHandleP->read((INERTIAL_DATA*)data, false);
+    return mtiHandleP->read((INERTIAL_DATA*)data, true);
 }
 
 
@@ -41,6 +43,9 @@ bool rmp440odo3d(MTI_DATA** mtiHandle, rmp440_mti* mti,
     rmp440_odometry_mode* odoMode, double period)
 {
 	PomEuler* attitude = (PomEuler*)&mti->data.euler;
+    //attitude->roll  = DEG_TO_RAD(attitude->roll);
+    //attitude->pitch = DEG_TO_RAD(attitude->pitch);
+    //attitude->yaw   = DEG_TO_RAD(attitude->yaw);
 
 	int i;
 	static double mpitch = 0.0, oldPitch = -1.0;
@@ -112,8 +117,10 @@ bool rmp440odo3d(MTI_DATA** mtiHandle, rmp440_mti* mti,
         attitude->pitch = 0.0;
         attitude->yaw   = 0.0;
 	}           
-	robot3d->pitch = attitude->pitch;
-	robot3d->roll = attitude->roll;
+	//robot3d->pitch = attitude->pitch;
+	//robot3d->roll = attitude->roll;
+	robot3d->pitch = DEG_TO_RAD(attitude->pitch);
+	robot3d->roll =  DEG_TO_RAD(attitude->roll);
 	/* XXXX For now keep the position in the Z=0 frame */
 	robot3d->theta  = robot->theta;
 	robot3d->xRob = robot->xRob;

@@ -361,9 +361,25 @@ odoAndAsserv(const rmp440_io *rmp,
 	gyroUpdate(gyroId, gyro, gyro_asserv, robot);
 
     ////////////////////////////////////////////////////////////////////////
-  
+ 
     if(*odoMode == rmp440_odometry_3d)
     {
+        double measuredPeriod = -1.0;
+        struct timeval tvLast, tvNew;
+        if(measuredPeriod < 0)
+        {
+            gettimeofday(&tvLast, NULL);
+            tvNew = tvLast;
+            measuredPeriod = 0.0;
+        }
+        else
+        {
+            gettimeofday(&tvNew, NULL);
+            measuredPeriod = (double)tvNew.tv_sec - (double)tvLast.tv_sec
+                + 1.0e-6*((double)tvNew.tv_sec - (double)tvLast.tv_sec);
+            tvLast = tvNew;
+        }
+
         if(rmp440odo3d(mtiHandle, mti, robot, robot3d, odoMode, rmp440_sec_period))
         {
             printf("acc  : %2.2f %2.2f %2.2f\ngyr  : %2.2f %2.2f %2.2f\nmag  : %2.2f %2.2f %2.2f\neuler: %2.2f %2.2f %2.2f\nperiod: %2.2lf\n\n",
@@ -380,6 +396,13 @@ odoAndAsserv(const rmp440_io *rmp,
                 mti->data.euler[1], 
                 mti->data.euler[2],
                 rmp440_sec_period);
+            //fflush(stdout);
+            printf("euler rpy: %2.2f %2.2f %2.2f\nperiods : %2.2lf %2.2lf\n\n",
+                robot3d->roll, 
+                robot3d->pitch, 
+                robot3d->theta,
+                rmp440_sec_period,
+                measuredPeriod);
             fflush(stdout);
         }
     }
@@ -961,6 +984,13 @@ rmp440MTIopen(const rmp440_mti_params *params, MTI_DATA **mtiHandle,
     mtiConfig->syncOutSkipFactor    = 0;
     mtiConfig->syncOutOffset        = 0;
     mtiConfig->syncOutPulseWidth    = 29498; //1ms pulse
+
+    //// Same config as mtiTest
+    //mtiHandleP = new MTI(params->port,
+    //    (OutputMode)mtiConfig->outputMode,
+    //    (OutputFormat)mtiConfig->outputFormat,
+    //    MTI_SYNCOUTMODE_DISABLED);
+        
     
     mtiHandleP = new MTI(params->port,
         (OutputMode)mtiConfig->outputMode,
