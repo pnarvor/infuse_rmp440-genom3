@@ -53,7 +53,7 @@ bool rmp440odo3d(MTI_DATA** mtiHandle, rmp440_mti* mti,
 	static double history_vel[RMP440_ZODOCOR_AVGVELSIZE] = {0.};
 	static int history_vel_i = 0;
 	double vel, accel;
-	PomEuler* attitude = (PomEuler*)&mti->data.euler;
+	PomEuler attitude;
 
 	/* 3D odometry */
 	if (*odoMode == rmp440_odometry_3d) {
@@ -62,8 +62,12 @@ bool rmp440odo3d(MTI_DATA** mtiHandle, rmp440_mti* mti,
             *odoMode = rmp440_odometry_2d;
 		} else
 		{
+            attitude.roll  = DEG_TO_RAD(mti->data.euler[0]);
+            attitude.pitch = DEG_TO_RAD(mti->data.euler[1]);
+            attitude.yaw   = DEG_TO_RAD(mti->data.euler[2]);
+
 			/* pause pitch updates if acceleration is too large */
-			history_pitch[history_pitch_i++] = attitude->pitch;
+			history_pitch[history_pitch_i++] = attitude.pitch;
 			if (history_pitch_i >= 2*RMP440_ZODOCOR_AVGPITCHSIZE) history_pitch_i = 0;
 			history_vel[history_vel_i++] = robot->v;
 			if (history_vel_i >= RMP440_ZODOCOR_AVGVELSIZE) history_vel_i = 0;
@@ -102,27 +106,25 @@ bool rmp440odo3d(MTI_DATA** mtiHandle, rmp440_mti* mti,
 						pausePitch = 0;
 				}
 				if (!pausePitch)
-					odoPitch = attitude->pitch;
+					odoPitch = attitude.pitch;
 			}
 		}
 	}
 	if (*odoMode == rmp440_odometry_2d) {
 		mpitch = 0;
 		oldPitch = -1;
-        attitude->roll  = 0.0;
-        attitude->pitch = 0.0;
-        attitude->yaw   = 0.0;
+        attitude.roll  = 0.0;
+        attitude.pitch = 0.0;
+        attitude.yaw   = 0.0;
 	}           
-	//robot3d->pitch = attitude->pitch;
-	//robot3d->roll = attitude->roll;
-	robot3d->pitch = DEG_TO_RAD(attitude->pitch);
-	robot3d->roll =  DEG_TO_RAD(attitude->roll);
+	robot3d->pitch = attitude.pitch;
+	robot3d->roll = attitude.roll;
 	/* XXXX For now keep the position in the Z=0 frame */
 	robot3d->theta  = robot->theta;
 	robot3d->xRob = robot->xRob;
 	robot3d->yRob = robot->yRob;
-	//robot3d->zRob += - (robot->v * period) * sin(odoPitch);
-	robot3d->zRob += - (robot->v * period) * sin(DEG_TO_RAD(odoPitch));
+	robot3d->zRob += - (robot->v * period) * sin(odoPitch);
+	//robot3d->zRob += - (robot->v * period) * sin(DEG_TO_RAD(odoPitch));
 	robot3d->xRef = robot->xRef;
 	robot3d->yRef = robot->yRef;
 	robot3d->zRef = 0.0;
