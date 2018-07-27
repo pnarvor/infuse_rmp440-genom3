@@ -32,8 +32,8 @@ bool readMTI(MTI_DATA** mtiHandle, rmp440_mti_inertial_data* data)
     if(!mtiHandleP)
         return false;
 
-    //return mtiHandleP->read((INERTIAL_DATA*)data, false);
-    return mtiHandleP->read((INERTIAL_DATA*)data, true);
+    return mtiHandleP->read((INERTIAL_DATA*)data, false);
+    //return mtiHandleP->read((INERTIAL_DATA*)data, true);
 }
 
 
@@ -42,11 +42,6 @@ bool rmp440odo3d(MTI_DATA** mtiHandle, rmp440_mti* mti,
     or_genpos_cart_state* robot, or_genpos_cart_3dstate* robot3d,
     rmp440_odometry_mode* odoMode, double period)
 {
-	PomEuler* attitude = (PomEuler*)&mti->data.euler;
-    //attitude->roll  = DEG_TO_RAD(attitude->roll);
-    //attitude->pitch = DEG_TO_RAD(attitude->pitch);
-    //attitude->yaw   = DEG_TO_RAD(attitude->yaw);
-
 	int i;
 	static double mpitch = 0.0, oldPitch = -1.0;
 	static int pausePitch = 0;
@@ -58,6 +53,7 @@ bool rmp440odo3d(MTI_DATA** mtiHandle, rmp440_mti* mti,
 	static double history_vel[RMP440_ZODOCOR_AVGVELSIZE] = {0.};
 	static int history_vel_i = 0;
 	double vel, accel;
+	PomEuler* attitude = (PomEuler*)&mti->data.euler;
 
 	/* 3D odometry */
 	if (*odoMode == rmp440_odometry_3d) {
@@ -125,7 +121,8 @@ bool rmp440odo3d(MTI_DATA** mtiHandle, rmp440_mti* mti,
 	robot3d->theta  = robot->theta;
 	robot3d->xRob = robot->xRob;
 	robot3d->yRob = robot->yRob;
-	robot3d->zRob += - (robot->v * period) * sin(odoPitch);
+	//robot3d->zRob += - (robot->v * period) * sin(odoPitch);
+	robot3d->zRob += - (robot->v * period) * sin(DEG_TO_RAD(odoPitch));
 	robot3d->xRef = robot->xRef;
 	robot3d->yRef = robot->yRef;
 	robot3d->zRef = 0.0;
