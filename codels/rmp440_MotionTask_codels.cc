@@ -51,9 +51,7 @@ extern "C" {
 
 ////////////////////////////////////////////////////////////////////////////////
 #include <sys/time.h>
-
 #include <Pose_InFuse.h>
-#include <sys/time.h>
 ////////////////////////////////////////////////////////////////////////////////
 
 /* --- Task MotionTask -------------------------------------------------- */
@@ -323,8 +321,6 @@ odoAndAsserv(const rmp440_io *rmp,
              const rmp440_StatusGeneric *StatusGeneric,
              const genom_context self)
 {
-    //printf("-----------------OdoAndAsserv!---------------------\n");
-    //printf("Robot theta : %f\n", robot->theta);
 	rmp440_feedback *data = *rs_data;
 	double direction;
 	rmp440_status_str *status = Status->data(self);
@@ -332,15 +328,6 @@ odoAndAsserv(const rmp440_io *rmp,
 	or_pose_estimator_state *pose = Pose->data(self);
 	genom_event report = genom_ok;
 	struct cmd_str cmd;
-
-    //double measuredPeriod = 0.0;
-    //static struct timeval tvLast, tvNew;
-    //gettimeofday(&tvNew, NULL);
-    //measuredPeriod = ((double)tvNew.tv_sec + 1.0e-6*(double)tvNew.tv_usec) 
-    //    - ((double)tvLast.tv_sec + 1.0e-6*(double)tvLast.tv_usec);
-    //printf("measured period : %lf\n", measuredPeriod);
-    //printf("%ld %ld\n%ld %ld\n\n",tvNew.tv_sec, tvNew.tv_usec, tvLast.tv_sec, tvLast.tv_usec);
-    //tvLast = tvNew;
 
 	if (rmp == NULL) {
 		StatusGeneric->write(self);
@@ -375,27 +362,27 @@ odoAndAsserv(const rmp440_io *rmp,
     {
         if(rmp440odo3d(mtiHandle, mti, robot, robot3d, odoMode, rmp440_sec_period))
         {
-            printf("acc  : %2.2f %2.2f %2.2f\ngyr  : %2.2f %2.2f %2.2f\nmag  : %2.2f %2.2f %2.2f\neuler: %2.2f %2.2f %2.2f\nperiod: %2.2lf\n\n",
-                mti->data.acc[0], 
-                mti->data.acc[1], 
-                mti->data.acc[2], 
-                mti->data.gyr[0], 
-                mti->data.gyr[1], 
-                mti->data.gyr[2], 
-                mti->data.mag[0], 
-                mti->data.mag[1], 
-                mti->data.mag[2],
-                mti->data.euler[0], 
-                mti->data.euler[1], 
-                mti->data.euler[2],
-                rmp440_sec_period);
+            //printf("acc  : %2.2f %2.2f %2.2f\ngyr  : %2.2f %2.2f %2.2f\nmag  : %2.2f %2.2f %2.2f\neuler: %2.2f %2.2f %2.2f\nperiod: %2.2lf\n\n",
+            //    mti->data.acc[0], 
+            //    mti->data.acc[1], 
+            //    mti->data.acc[2], 
+            //    mti->data.gyr[0], 
+            //    mti->data.gyr[1], 
+            //    mti->data.gyr[2], 
+            //    mti->data.mag[0], 
+            //    mti->data.mag[1], 
+            //    mti->data.mag[2],
+            //    mti->data.euler[0], 
+            //    mti->data.euler[1], 
+            //    mti->data.euler[2],
+            //    rmp440_sec_period);
+            ////fflush(stdout);
+            //printf("euler rpy: %2.2f %2.2f %2.2f\nperiod : %2.2lf\n\n",
+            //    robot3d->roll, 
+            //    robot3d->pitch, 
+            //    robot3d->theta,
+            //    rmp440_sec_period);
             //fflush(stdout);
-            printf("euler rpy: %2.2f %2.2f %2.2f\nperiod : %2.2lf\n\n",
-                robot3d->roll, 
-                robot3d->pitch, 
-                robot3d->theta,
-                rmp440_sec_period);
-            fflush(stdout);
         }
     }
 
@@ -421,9 +408,9 @@ odoAndAsserv(const rmp440_io *rmp,
 	    pose->pos._value.y = robot3d->yRob;
 	    pose->pos._value.z = robot3d->zRob;
 	    eulerToQuaternion(robot3d->roll,
-                            robot3d->pitch,
-                            robot3d->theta,
-                            &pose->pos._value);
+                          robot3d->pitch,
+                          robot3d->theta,
+                          &pose->pos._value);
     }
 	
     pose->vel._present = true;
