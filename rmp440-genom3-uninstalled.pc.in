@@ -7,5 +7,5 @@ includedir=${prefix}/codels
 Name: rmp440-genom3
 Description: rmp440 interface and codels library
 Version: @PACKAGE_VERSION@
-Requires: gyro-libs >= 3.0.99.0, openrobots-idl >= 1.1, infuse_types-genom3 >= 0.1, rmp440-libs >= 0.5, gyro-libs, felib, MTI-clients, cdff_types
+Requires: gyro-libs >= 3.0.99.0, openrobots-idl >= 1.1, infuse-idl >= 0.1, rmp440-libs >= 0.5, gyro-libs, felib, MTI-clients, infuse_asn1_types >= 0.1
 Libs: ${libdir}/librmp440_codels.la

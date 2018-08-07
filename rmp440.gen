@@ -26,14 +26,14 @@
 #include "or/hid/joystick.gen"
 #include "or/pose/pose_estimator.gen"
 
-#pragma require "infuse_types-genom3 >= 0.1"
-#include "infuse_types/asn1/bitstream.idl"
+#pragma require "infuse-idl >= 0.1"
+#include "infuse/asn1/bitstream.gen"
 
 component rmp440 {
   version "0.1.99";
   email "openrobots@laas.fr";
   lang "c";
-  codels-require "rmp440-libs >= 0.5, gyro-libs, felib, MTI-clients, cdff_types";
+  codels-require "rmp440-libs >= 0.5, gyro-libs, felib, MTI-clients, infuse_asn1_types >= 0.1";
 
   exception already_initialized;
   exception not_connected;

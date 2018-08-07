@@ -26,7 +26,7 @@
 
 #include "rmp440_c_types.h"
 
-#include <Twist_InFuse.h>
+#include <infuse_asn1_types/TwistWithCovariance.h>
 #define RMP440_VMAX 1.0
 #define RMP440_WMAX 1.1
 #define RMP440_ACCEL_LIN_MAX 2.0
@@ -41,7 +41,7 @@ pumpSpeedReferenceInfuse(const or_genpos_cart_state *robot,
 {
     asn1_bitstream* gbstream;
     BitStream bstream;
-    Twist_InFuse asnTwist;
+    asn1SccTwistWithCovariance asnTwist;
     flag res;
     int errorCode;
 
@@ -53,35 +53,35 @@ pumpSpeedReferenceInfuse(const or_genpos_cart_state *robot,
 		printf("%s: orders == NULL\n", __func__);
 		return rmp440_pause_track_main;
 	}
-    BitStream_AttachBuffer(&bstream, gbstream->data._buffer, Twist_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    BitStream_AttachBuffer(&bstream, gbstream->data._buffer, asn1SccTwistWithCovariance_REQUIRED_BYTES_FOR_ENCODING);
 
-    res = Twist_InFuse_Decode(&asnTwist, &bstream, &errorCode);
+    res = asn1SccTwistWithCovariance_Decode(&asnTwist, &bstream, &errorCode);
     if(!res)
     {
-        printf("Error decoding Twist_InFuse in %s, code : %d\n", __func__, errorCode);
+        printf("Error decoding asn1SccTwistWithCovariance in %s, code : %d\n", __func__, errorCode);
 		return rmp440_pause_track_main;
     }
     
-    if(asnTwist.twist.vel.arr[0] > RMP440_VMAX)
+    if(asnTwist.data.vel.arr[0] > RMP440_VMAX)
     {
         printf("Warning linear velocity : asked %fm/s, max is %fm/s\n",
-            asnTwist.twist.vel.arr[0], RMP440_VMAX);
+            asnTwist.data.vel.arr[0], RMP440_VMAX);
 	    ref->v = RMP440_VMAX;
     }
     else
     {
-	    ref->v = asnTwist.twist.vel.arr[0];
+	    ref->v = asnTwist.data.vel.arr[0];
     }
 	ref->vt = 0;
-    if(asnTwist.twist.rot.arr[2] > RMP440_WMAX)
+    if(asnTwist.data.rot.arr[2] > RMP440_WMAX)
     {
         printf("Warning angular velocity : asked %frad/s, max is %frad/s\n",
-            asnTwist.twist.rot.arr[2], RMP440_WMAX);
+            asnTwist.data.rot.arr[2], RMP440_WMAX);
 	    ref->w = RMP440_WMAX;
     }
     else
     {
-	    ref->w = asnTwist.twist.rot.arr[2];
+	    ref->w = asnTwist.data.rot.arr[2];
     }
     
     // parameters to check.. see pumpSpeedReference below

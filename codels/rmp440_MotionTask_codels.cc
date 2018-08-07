@@ -51,7 +51,7 @@ extern "C" {
 
 ////////////////////////////////////////////////////////////////////////////////
 #include <sys/time.h>
-#include <Pose_InFuse.h>
+#include <infuse_asn1_types/TransformWithCovariance.h>
 ////////////////////////////////////////////////////////////////////////////////
 
 /* --- Task MotionTask -------------------------------------------------- */
@@ -241,11 +241,11 @@ initOdoAndAsserv(rmp440_ids *ids, const rmp440_PoseInfuse *PoseInfuse,
     sprintf(gbstream->header.frame_id, "RoverBodyFrame");
    
     //// Init bistream type
-    gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
-    sprintf(gbstream->type, "Pose_InFuse");
+    gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("TransformWithCovariance")));
+    sprintf(gbstream->type, "TransformWithCovariance");
     gbstream->serialization_method = 0; //uPER
     //reserve memory for serialized data 
-    genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    genom_sequence_reserve(&(gbstream->data), asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING);
     gbstream->data._length = 0;
 
     *infuseTrackMode = 0;
@@ -497,45 +497,45 @@ odoAndAsserv(const rmp440_io *rmp,
     gettimeofday(&tv,NULL);
     long long timeNow = tv.tv_sec*1000000 + tv.tv_usec;
     
-    Pose_InFuse asnPose;
-    asnPose.msgVersion = pose_InFuse_Version;
+    asn1SccTransformWithCovariance asnPose;
+    asnPose.metadata.msgVersion = transformWithCovariance_version;
 
-    //strcpy(asnPose.parentFrameId.arr, "LocalTerrainFrame");
-    sprintf((char*)asnPose.parentFrameId.arr, "LocalTerrainFrame");
-    asnPose.parentFrameId.nCount = strlen((char*)asnPose.parentFrameId.arr) + 1;
-    asnPose.parentTime.microseconds  = timeNow;
-    asnPose.parentTime.usecPerSec = 1000000;
+    //strcpy(asnPose.metadata.parentFrameId.arr, "LocalTerrainFrame");
+    sprintf((char*)asnPose.metadata.parentFrameId.arr, "LocalTerrainFrame");
+    asnPose.metadata.parentFrameId.nCount = strlen((char*)asnPose.metadata.parentFrameId.arr) + 1;
+    asnPose.metadata.parentTime.microseconds  = timeNow;
+    asnPose.metadata.parentTime.usecPerSec = 1000000;
 
-    //strcpy(asnPose.childFrameId.arr, "RoverBodyFrame");
-    sprintf((char*)asnPose.childFrameId.arr, "RoverBodyFrame");
-    asnPose.childFrameId.nCount = strlen((char*)asnPose.childFrameId.arr) + 1;
-    asnPose.childTime.microseconds  = timeNow;
-    asnPose.childTime.usecPerSec = 1000000;
+    //strcpy(asnPose.metadata.childFrameId.arr, "RoverBodyFrame");
+    sprintf((char*)asnPose.metadata.childFrameId.arr, "RoverBodyFrame");
+    asnPose.metadata.childFrameId.nCount = strlen((char*)asnPose.metadata.childFrameId.arr) + 1;
+    asnPose.metadata.childTime.microseconds  = timeNow;
+    asnPose.metadata.childTime.usecPerSec = 1000000;
     
-    asnPose.transform.translation.nCount = 3;
-    asnPose.transform.translation.arr[0] = pose->pos._value.x;
-    asnPose.transform.translation.arr[1] = pose->pos._value.y;
-    asnPose.transform.translation.arr[2] = pose->pos._value.z;
+    asnPose.data.translation.nCount = 3;
+    asnPose.data.translation.arr[0] = pose->pos._value.x;
+    asnPose.data.translation.arr[1] = pose->pos._value.y;
+    asnPose.data.translation.arr[2] = pose->pos._value.z;
 
-    asnPose.transform.orientation.nCount = 4;
-    asnPose.transform.orientation.arr[0] = pose->pos._value.qx;
-    asnPose.transform.orientation.arr[1] = pose->pos._value.qy;
-    asnPose.transform.orientation.arr[2] = pose->pos._value.qz;
-    asnPose.transform.orientation.arr[3] = pose->pos._value.qw;
+    asnPose.data.orientation.nCount = 4;
+    asnPose.data.orientation.arr[0] = pose->pos._value.qx;
+    asnPose.data.orientation.arr[1] = pose->pos._value.qy;
+    asnPose.data.orientation.arr[2] = pose->pos._value.qz;
+    asnPose.data.orientation.arr[3] = pose->pos._value.qw;
 
     // TODO translate or_pose_estimator covariance to envire covariance
-    asnPose.transform.cov.nCount = 6;
+    asnPose.data.cov.nCount = 6;
     for(int i = 0; i < 6; i++)
     {
-        asnPose.transform.cov.arr[i].nCount = 6;
+        asnPose.data.cov.arr[i].nCount = 6;
         for(int j = 0; j < 6; j++)
         {
-            asnPose.transform.cov.arr[i].arr[j] = 0;
+            asnPose.data.cov.arr[i].arr[j] = 0;
         }
     }
     // to have a well defined cov matrix :
     for(int i = 0; i < 6; i++)
-        asnPose.transform.cov.arr[i].arr[i] = 1e-6;
+        asnPose.data.cov.arr[i].arr[i] = 1e-6;
     
     asn1_bitstream* gbstream = PoseInfuse->data(self);
     if(!gbstream || !pose)
@@ -551,15 +551,15 @@ odoAndAsserv(const rmp440_io *rmp,
     flag res;
     int errorCode;
     BitStream bstream;
-    BitStream_Init(&bstream, gbstream->data._buffer, Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
-    res = Pose_InFuse_Encode(&asnPose, &bstream, &errorCode, TRUE);
+    BitStream_Init(&bstream, gbstream->data._buffer, asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING);
+    res = asn1SccTransformWithCovariance_Encode(&asnPose, &bstream, &errorCode, TRUE);
     if(!res)
     {
         printf("error, Pose_Infuse encoding error : %d\n", errorCode);
 	    return rmp440_pause_odo;
     }
     //Set encoded size in bistream
-    gbstream->data._length = Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING;
+    gbstream->data._length = asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING;
     gbstream->data._length = bstream.count;
 
     PoseInfuse->write(self);
@@ -728,11 +728,11 @@ rmp440InitMain(rmp440_io **rmp, FE_STR **fe, rmp440_feedback **rs_data,
     //sprintf(gbstream->header.frame_id, "RoverBodyFrame");
    
     ////// Init bistream type
-    //gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("Pose_InFuse")));
-    //sprintf(gbstream->type, "Pose_InFuse");
+    //gbstream->type = (char*)malloc(sizeof(char)*(1 + strlen("TransformWithCovariance")));
+    //sprintf(gbstream->type, "TransformWithCovariance");
     //gbstream->serialization_method = 0; //uPER
     ////reserve memory for serialized data 
-    //genom_sequence_reserve(&(gbstream->data), Pose_InFuse_REQUIRED_BYTES_FOR_ENCODING);
+    //genom_sequence_reserve(&(gbstream->data), asn1SccTransformWithCovariance_REQUIRED_BYTES_FOR_ENCODING);
     //gbstream->data._length = 0;
     //////////////////////////////////////////////////////////////////////////////////////
 
