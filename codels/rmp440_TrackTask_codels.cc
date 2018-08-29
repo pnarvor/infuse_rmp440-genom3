@@ -30,7 +30,7 @@
 #define RMP440_VMAX 1.0
 #define RMP440_WMAX 1.1
 #define RMP440_ACCEL_LIN_MAX 2.0
-#define RMP440_ACCEL_ANG_MAX 3.0
+#define RMP440_ACCEL_ANG_MAX 2.0
 
 /* --- Task TrackTask --------------------------------------------------- */
 
@@ -206,6 +206,103 @@ smoothStopTrack(const or_genpos_cart_state *robot,
                 const rmp440_dynamic_str *dynamics,
                 rmp440_mode *rs_mode, or_genpos_cart_speed *ref,
                 const genom_context self)
+{
+	printf("rmp440 smoothStopTrack\n");
+
+	/* Set a null speed and stop the tracking */
+	/* XXX should compute a decceleration ramp */
+	ref->v = 0.0;
+	ref->w = 0.0;
+	*rs_mode = rmp440_mode_idle;
+	return rmp440_ether;
+}
+
+
+/* --- Activity DirectTrack --------------------------------------------- */
+
+/** Codel directTrackStart of activity DirectTrack.
+ *
+ * Triggered by rmp440_start.
+ * Yields to rmp440_track_main, rmp440_end.
+ * Throws rmp440_not_connected, rmp440_port_not_found, rmp440_bad_ref,
+ *        rmp440_cmd_stop_track, rmp440_motors_off,
+ *        rmp440_emergency_stop, rmp440_power_cord_connected,
+ *        rmp440_invalid_parameter.
+ */
+genom_event
+directTrackStart(rmp440_mode *rs_mode, double v, double w,
+                 const genom_context self)
+{
+	printf("-- %s\n", __func__);
+    if(fabs(v) > RMP440_VMAX)
+    {
+        printf("Error : velovity parameter too high (asked %2.2lf, max is %2.2lf).",
+            v,RMP440_VMAX);
+        return rmp440_invalid_parameter(self);
+    }
+    if(fabs(w) > RMP440_WMAX)
+    {
+        printf("Error : angular velovity parameter too high (asked %2.2lf, max is %2.2lf).",
+            w,RMP440_WMAX);
+        return rmp440_invalid_parameter(self);
+    }
+    *rs_mode = rmp440_mode_track;
+    return rmp440_track_main;
+}
+
+/** Codel directPumpReference of activity DirectTrack.
+ *
+ * Triggered by rmp440_track_main.
+ * Yields to rmp440_pause_track_main, rmp440_end.
+ * Throws rmp440_not_connected, rmp440_port_not_found, rmp440_bad_ref,
+ *        rmp440_cmd_stop_track, rmp440_motors_off,
+ *        rmp440_emergency_stop, rmp440_power_cord_connected,
+ *        rmp440_invalid_parameter.
+ */
+genom_event
+directPumpReference(const or_genpos_cart_state *robot,
+                    rmp440_mode rs_mode, double v, double w,
+                    or_genpos_cart_speed *ref,
+                    const genom_context self)
+{
+	if (rs_mode != rmp440_mode_track)
+    {
+		ref->v = 0;
+		ref->w = 0;
+		switch (rs_mode) {
+		case rmp440_mode_emergency:
+			return rmp440_emergency_stop(self);
+		case rmp440_mode_motors_off:
+			return rmp440_motors_off(self);
+		default:
+		return rmp440_bad_ref(self);
+		}
+    }
+
+    ref->v = v;
+    ref->w = w;
+	ref->vmax = RMP440_VMAX;
+	ref->wmax = RMP440_WMAX;
+	ref->linAccelMax = RMP440_ACCEL_LIN_MAX;
+	ref->angAccelMax = RMP440_ACCEL_ANG_MAX;
+
+    return rmp440_pause_track_main;
+}
+
+/** Codel directSmoothStopTrack of activity DirectTrack.
+ *
+ * Triggered by rmp440_end.
+ * Yields to rmp440_ether.
+ * Throws rmp440_not_connected, rmp440_port_not_found, rmp440_bad_ref,
+ *        rmp440_cmd_stop_track, rmp440_motors_off,
+ *        rmp440_emergency_stop, rmp440_power_cord_connected,
+ *        rmp440_invalid_parameter.
+ */
+genom_event
+directSmoothStopTrack(const or_genpos_cart_state *robot,
+                      const rmp440_dynamic_str *dynamics,
+                      rmp440_mode *rs_mode, or_genpos_cart_speed *ref,
+                      const genom_context self)
 {
 	printf("rmp440 smoothStopTrack\n");
 

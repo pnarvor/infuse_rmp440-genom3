@@ -46,6 +46,19 @@ trackControl(const rmp440_io *rmp, const rmp440_feedback *rs_data,
 }
 
 
+/* --- Activity DirectTrack --------------------------------------------- */
+
+/** Validation codel trackControl of activity DirectTrack.
+ *
+ * Returns genom_ok.
+ * Throws rmp440_not_connected, rmp440_port_not_found, rmp440_bad_ref,
+ * rmp440_cmd_stop_track, rmp440_motors_off, rmp440_emergency_stop,
+ * rmp440_power_cord_connected, rmp440_invalid_parameter.
+ */
+/* already defined in service Track validation */
+
+
+
 /* --- Function toggleInfuseTrackMode ----------------------------------- */
 
 /** Codel toggleInfuseTrackMode of function toggleInfuseTrackMode.

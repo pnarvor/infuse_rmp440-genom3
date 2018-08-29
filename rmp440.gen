@@ -50,6 +50,7 @@ component rmp440 {
   exception port_not_found;
   exception cmd_stop_track;
   exception sys_error;
+  exception invalid_parameter;
 
   port in or::genpos::cart_speed cmd_vel;
   port in asn1::bitstream cmd_vel_Infuse;
@@ -199,6 +200,27 @@ component rmp440 {
   function Stop() {
     doc "Stop current Tracking";
     interrupts Track;
+  };
+
+  /*----------------------------------------------------------------------*/
+
+  activity DirectTrack(in double v, in double w) {
+    doc "Set (v,w) directly with a rosaction";
+    validate trackControl(in rmp, in rs_data);
+    codel <start>directTrackStart(inout rs_mode,
+                in v, in w) yield track_main, end;
+    codel <track_main>directPumpReference(in robot,
+			      in rs_mode,
+                  in v, in w,
+			      out ref) yield pause::track_main, end;
+    codel <end>directSmoothStopTrack(in robot,
+			       in dynamics,
+			       inout rs_mode,
+			       out ref) yield ether;
+    task TrackTask;
+    throw not_connected, port_not_found, bad_ref, cmd_stop_track,
+      motors_off, emergency_stop, power_cord_connected, invalid_parameter;
+    interrupts JoystickOn, Track;
   };
 
   /*----------------------------------------------------------------------*/
