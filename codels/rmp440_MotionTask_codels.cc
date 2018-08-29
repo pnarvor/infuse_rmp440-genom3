@@ -512,22 +512,18 @@ odoAndAsserv(const rmp440_io *rmp,
     asnPose.metadata.childTime.microseconds  = timeNow;
     asnPose.metadata.childTime.usecPerSec = 1000000;
     
-    asnPose.data.translation.nCount = 3;
     asnPose.data.translation.arr[0] = pose->pos._value.x;
     asnPose.data.translation.arr[1] = pose->pos._value.y;
     asnPose.data.translation.arr[2] = pose->pos._value.z;
 
-    asnPose.data.orientation.nCount = 4;
     asnPose.data.orientation.arr[0] = pose->pos._value.qx;
     asnPose.data.orientation.arr[1] = pose->pos._value.qy;
     asnPose.data.orientation.arr[2] = pose->pos._value.qz;
     asnPose.data.orientation.arr[3] = pose->pos._value.qw;
 
     // TODO translate or_pose_estimator covariance to envire covariance
-    asnPose.data.cov.nCount = 6;
     for(int i = 0; i < 6; i++)
     {
-        asnPose.data.cov.arr[i].nCount = 6;
         for(int j = 0; j < 6; j++)
         {
             asnPose.data.cov.arr[i].arr[j] = 0;
