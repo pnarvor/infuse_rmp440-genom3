@@ -164,7 +164,7 @@ component rmp440 {
     codel <inter>rmp440JoystickOnInter(out rs_mode, out ref) yield ether;
     throw bad_ref, rmplib_error, joystick_error, motors_off,
       emergency_stop, power_cord_connected;
-    interrupts JoystickOn, Track;
+    interrupts JoystickOn, Track, DirectTrack;
   };
 
   /*----------------------------------------------------------------------*/
@@ -189,7 +189,7 @@ component rmp440 {
     task TrackTask;
     throw not_connected, port_not_found, bad_ref, cmd_stop_track,
       motors_off, emergency_stop, power_cord_connected;
-    interrupts JoystickOn, Track;
+    interrupts JoystickOn, Track, DirectTrack;
   };
   
   function toggleInfuseTrackMode() {
@@ -199,7 +199,8 @@ component rmp440 {
 
   function Stop() {
     doc "Stop current Tracking";
-    interrupts Track;
+        codel setZeroVelocity(out rs_mode, out ref);
+    interrupts Track, DirectTrack;
   };
 
   /*----------------------------------------------------------------------*/
@@ -220,7 +221,7 @@ component rmp440 {
     task TrackTask;
     throw not_connected, port_not_found, bad_ref, cmd_stop_track,
       motors_off, emergency_stop, power_cord_connected, invalid_parameter;
-    interrupts JoystickOn, Track;
+    interrupts JoystickOn, Track, DirectTrack;
   };
 
   /*----------------------------------------------------------------------*/

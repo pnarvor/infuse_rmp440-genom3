@@ -88,6 +88,25 @@ toggleInfuseTrackMode(rmp440_mode rs_mode, uint8_t *infuseTrackMode,
 }
 
 
+/* --- Function Stop ---------------------------------------------------- */
+
+/** Codel setZeroVelocity of function Stop.
+ *
+ * Returns genom_ok.
+ */
+genom_event
+setZeroVelocity(rmp440_mode *rs_mode, or_genpos_cart_speed *ref,
+                const genom_context self)
+{
+    ref->v = 0;
+    ref->w = 0;
+
+    *rs_mode = rmp440_mode_idle;
+
+    return genom_ok;
+}
+
+
 /* --- Function log ----------------------------------------------------- */
 
 /** Codel log_start of function log.
